@@ -122,7 +122,8 @@ RUN ./root/.rbenv/shims/gem install bundler \
     && ./root/.rbenv/shims/gem install pg \
     && ./root/.rbenv/shims/gem install mysql2 \
     && ./root/.rbenv/shims/gem install sequel_pg \
-    && ./root/.rbenv/shims/gem install apktools
+    && ./root/.rbenv/shims/gem install apktools \
+    && ./root/.rbenv/shims/gem install rubocop
 
 #-----------------------------------------------------------------------------
 # Install Ruby Packages (rvm) - alternatives
@@ -138,7 +139,8 @@ RUN ./root/.rbenv/shims/gem install bundler \
 #     && ./root/.rvm/scripts/gem install pg \
 #     && ./root/.rvm/scripts/gem install mysql2 \
 #     && ./root/.rvm/scripts/gem install sequel_pg \
-#     && ./root/.rvm/scripts/gem install apktools
+#     && ./root/.rvm/scripts/gem install apktools \
+#     && ./root/.rbenv/shims/gem install rubocop
 
 #-----------------------------------------------------------------------------
 # Create Workspace Application Folder
@@ -159,6 +161,12 @@ VOLUME ["/application", "/root"]
 # Finalize (reconfigure)
 #-----------------------------------------------------------------------------
 COPY rootfs/ /
+
+#-----------------------------------------------------------------------------
+# Setup TrueColors (Terminal)
+#-----------------------------------------------------------------------------
+RUN cd /root/colors \
+    && /bin/sh 24-bit-colors.sh
 
 #-----------------------------------------------------------------------------
 # Run Init Docker Container
