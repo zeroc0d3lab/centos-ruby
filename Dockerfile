@@ -29,7 +29,6 @@ RUN yum -y install \
          libevent-devel \
          ncurses-devel \
          glibc-static \
-         nodejs \
 
 #-----------------------------------------------------------------------------
 # Install MySQL (MariaDB) Library
@@ -69,7 +68,12 @@ RUN yum -y install \
          autoconf \
          automake \
          libtool \
-         sqlite-devel \
+         sqlite-devel 
+
+#-----------------------------------------------------------------------------
+# Install NodeJS
+#-----------------------------------------------------------------------------
+RUN yum -y install nodejs \
 
 #-----------------------------------------------------------------------------
 # Clean Up All Cache
