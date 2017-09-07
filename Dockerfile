@@ -147,6 +147,7 @@ RUN ./root/.rbenv/shims/gem install bundler \
 #     && ./root/.rvm/scripts/gem install apktools \
 #     && ./root/.rbenv/shims/gem install rubocop
 
+
 #-----------------------------------------------------------------------------
 # Create Workspace Application Folder
 #-----------------------------------------------------------------------------
@@ -165,8 +166,8 @@ VOLUME ["/application", "/root"]
 #-----------------------------------------------------------------------------
 # Setup TrueColors (Terminal)
 #-----------------------------------------------------------------------------
-COPY ./rootfs/root/colors/24-bit-colors.sh /root/colors/24-bit-colors.sh
-RUN ./root/colors/24-bit-colors.sh
+COPY ./rootfs/root/colors/24-bit-color.sh /root/colors/24-bit-color.sh
+RUN ./root/colors/24-bit-color.sh
 
 #-----------------------------------------------------------------------------
 # Finalize (reconfigure)
