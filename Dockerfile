@@ -68,12 +68,12 @@ RUN yum -y install \
          autoconf \
          automake \
          libtool \
-         sqlite-devel 
+         sqlite-devel
 
 #-----------------------------------------------------------------------------
 # Install NodeJS
 #-----------------------------------------------------------------------------
-RUN yum -y install nodejs \
+RUN yum -y install nodejs npm --enablerepo=epel \
 
 #-----------------------------------------------------------------------------
 # Clean Up All Cache
@@ -169,7 +169,7 @@ COPY rootfs/ /
 #-----------------------------------------------------------------------------
 # Setup TrueColors (Terminal)
 #-----------------------------------------------------------------------------
-RUN /bin/sh ./root/colors/24-bit-colors.sh
+RUN ./root/colors/24-bit-colors.sh
 
 #-----------------------------------------------------------------------------
 # Run Init Docker Container
