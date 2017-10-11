@@ -193,6 +193,7 @@ RUN git clone https://github.com/rbenv/rbenv.git /root/.rbenv \
 COPY ./rootfs/root/Gemfile /root/Gemfile
 COPY ./rootfs/root/Gemfile.lock /root/Gemfile.lock
 
+USER root
 #-----------------------------------------------------------------------------
 # Install Ruby Packages (rbenv/rvm)
 #-----------------------------------------------------------------------------
@@ -216,7 +217,7 @@ EXPOSE 22
 #-----------------------------------------------------------------------------
 # Set Volume Docker Workspace
 #-----------------------------------------------------------------------------
-VOLUME [${PATH_WORKSPACE}]
+VOLUME [${PATH_WORKSPACE}, "/root"]
 
 #-----------------------------------------------------------------------------
 # Finalize (reconfigure)
