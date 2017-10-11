@@ -1,10 +1,22 @@
-FROM zeroc0d3lab/centos-base-consul-lite:latest
+FROM zeroc0d3lab/centos-base-consul:latest
 MAINTAINER ZeroC0D3 Team <zeroc0d3.team@gmail.com>
 
 #-----------------------------------------------------------------------------
 # Set Environment
 #-----------------------------------------------------------------------------
-ENV RUBY_VERSION=2.4.1
+ENV RUBY_VERSION=2.4.2 \
+    PATH_WORKSPACE=/home/docker
+
+#-----------------------------------------------------------------------------
+# Set Group & User for 'docker'
+#-----------------------------------------------------------------------------
+RUN mkdir -p ${PATH_WORKSPACE} \
+    && groupadd docker \
+    && useradd -r -g docker docker \
+    && usermod -aG docker docker \
+    && chown -R docker:docker ${PATH_WORKSPACE} \
+    && mkdir -p ${PATH_WORKSPACE}/git-shell-commands \
+    && chmod 755 ${PATH_WORKSPACE}/git-shell-commands
 
 #-----------------------------------------------------------------------------
 # Find Fastest Repo & Update Repo
@@ -13,22 +25,23 @@ RUN yum makecache fast \
     && yum -y update
 
 #-----------------------------------------------------------------------------
-# Install Workspace Dependency
+# Install Workspace Dependency (1)
 #-----------------------------------------------------------------------------
 RUN yum -y install \
            --setopt=tsflags=nodocs \
            --disableplugin=fastestmirror \
          git \
-         nano \
-         zip \
-         unzip \
+         git-core \
          zsh \
          gcc \
+         gcc-c++ \
+         autoconf \
          automake \
          make \
          libevent-devel \
          ncurses-devel \
          glibc-static \
+         fontconfig \
 
 #-----------------------------------------------------------------------------
 # Install MySQL (MariaDB) Library
@@ -44,47 +57,108 @@ RUN yum -y install \
 
 ### PostgreSQL 9.6 ###
     && rpm -iUvh https://yum.postgresql.org/9.6/redhat/rhel-7-x86_64/pgdg-centos96-9.6-3.noarch.rpm \
-    && yum install -y postgresql96-libs postgresql96-server postgresql96-devel
+    && yum install -y postgresql96-libs postgresql96-server postgresql96-devel \
 
 #-----------------------------------------------------------------------------
-# Install Ruby Dependency
+# Install Workspace Dependency (2)
 #-----------------------------------------------------------------------------
 RUN yum -y install \
            --setopt=tsflags=nodocs \
            --disableplugin=fastestmirror \
-         git-core \
          zlib \
          zlib-devel \
-         gcc-c++ \
          patch \
          readline \
          readline-devel \
          libyaml-devel \
          libffi-devel \
          openssl-devel \
-         make \
          bzip2 \
          bison \
-         autoconf \
-         automake \
          libtool \
          sqlite-devel
 
 #-----------------------------------------------------------------------------
-# Install NodeJS
-#-----------------------------------------------------------------------------
-# RUN yum -y install nodejs npm --enablerepo=epel \
-RUN yum -y install https://kojipkgs.fedoraproject.org//packages/http-parser/2.7.1/3.el7/x86_64/http-parser-2.7.1-3.el7.x86_64.rpm nodejs \
-
-#-----------------------------------------------------------------------------
 # Clean Up All Cache
 #-----------------------------------------------------------------------------
-    && yum clean all
+RUN yum clean all
 
 #-----------------------------------------------------------------------------
-# Setup Locale UTF-8
+# Download & Install
+# -) bash_it (bash + themes)
+# -) oh-my-zsh (zsh + themes)
 #-----------------------------------------------------------------------------
-RUN ["/usr/bin/localedef", "-i", "en_US", "-f", "UTF-8", "en_US.UTF-8"]
+RUN rm -rf /root/.bash_it \
+    && rm -rf /root/.oh-my-zsh \
+    && touch /root/.bashrc \
+    && touch /root/.zshrc \
+    && cd /root \
+    && git clone https://github.com/Bash-it/bash-it.git /root/bash_it \
+    && git clone https://github.com/speedenator/agnoster-bash.git /root/bash_it/themes/agnoster-bash \
+    && git clone https://github.com/robbyrussell/oh-my-zsh.git /root/oh-my-zsh \
+    && mv /root/bash_it /root/.bash_it \
+    && mv /root/oh-my-zsh /root/.oh-my-zsh
+
+#-----------------------------------------------------------------------------
+# Download & Install
+# -) tmux + themes
+#-----------------------------------------------------------------------------
+RUN rm -rf /tmp/tmux \
+    && rm -rf /root/.tmux/plugins/tpm \
+    && touch /root/.tmux.conf \
+    && git clone https://github.com/tmux-plugins/tpm.git /root/tmux/plugins/tpm \
+    && git clone https://github.com/tmux/tmux.git /tmp/tmux \
+    && git clone https://github.com/seebi/tmux-colors-solarized.git /root/tmux-colors-solarized \
+    && mv /root/tmux /root/.tmux
+
+RUN cd /tmp/tmux \
+    && /bin/sh autogen.sh \
+    && /bin/sh ./configure \
+    && sudo make \
+    && sudo make install
+
+#-----------------------------------------------------------------------------
+# Install Font Config
+#-----------------------------------------------------------------------------
+RUN mkdir -p /root/.fonts \
+    && mkdir -p /root/.config/fontconfig/conf.d/ \
+    && mkdir -p /usr/share/fonts/local \
+    && wget https://github.com/powerline/powerline/raw/develop/font/PowerlineSymbols.otf -O /root/.fonts/PowerlineSymbols.otf \
+    && wget https://github.com/powerline/powerline/raw/develop/font/10-powerline-symbols.conf -O /root/.config/fontconfig/conf.d/10-powerline-symbols.conf \
+    && cp /root/.fonts/PowerlineSymbols.otf /usr/share/fonts/local/PowerlineSymbols.otf \
+    && cp /root/.fonts/PowerlineSymbols.otf /usr/share/fonts/PowerlineSymbols.otf \
+    && cp /root/.config/fontconfig/conf.d/10-powerline-symbols.conf /etc/fonts/conf.d/10-powerline-symbols.conf \
+    && ./usr/bin/fc-cache -vf /root/.fonts/ \
+    && ./usr/bin/fc-cache -vf /usr/share/fonts
+
+#-----------------------------------------------------------------------------
+# Download & Install
+# -) dircolors (terminal colors)
+#-----------------------------------------------------------------------------
+RUN git clone https://github.com/Anthony25/gnome-terminal-colors-solarized.git /root/solarized \
+    && mv /root/solarized /root/.solarized
+
+#-----------------------------------------------------------------------------
+# Download & Install
+# -) vim
+# -) vundle + themes
+#-----------------------------------------------------------------------------
+RUN git clone https://github.com/vim/vim.git /root/vim
+
+RUN cd /root/vim/src \
+    && /bin/sh ./configure \
+    && sudo make \
+    && sudo make install \
+    && sudo mkdir /usr/share/vim \
+    && sudo mkdir /usr/share/vim/vim80/ \
+    && sudo cp -fr /root/vim/runtime/* /usr/share/vim/vim80/ \
+    && git clone https://github.com/zeroc0d3/vim-ide.git /root/vim-ide \
+    && /bin/sh /root/vim-ide/step02.sh
+
+RUN git clone https://github.com/dracula/vim.git /tmp/themes/dracula \
+    && git clone https://github.com/blueshirts/darcula.git /tmp/themes/darcula \
+    && sudo cp /tmp/themes/dracula/colors/dracula.vim /root/.vim/bundle/vim-colors/colors/dracula.vim \
+    && sudo cp /tmp/themes/darcula/colors/darcula.vim /root/.vim/bundle/vim-colors/colors/darcula.vim
 
 #-----------------------------------------------------------------------------
 # Prepare Install Ruby
@@ -127,19 +201,43 @@ RUN chmod a+x /root/gems.sh \
     && ./root/gems.sh
 
 #-----------------------------------------------------------------------------
-# Create Workspace Application Folder
+# Install Javascipt Unit Test
 #-----------------------------------------------------------------------------
-RUN ["mkdir", "-p", "/application"]
+RUN ./usr/bin/npm install chai \
+    && ./usr/bin/npm install tv4 \
+    && ./usr/bin/npm install newman \
 
 #-----------------------------------------------------------------------------
-# Set PORT Docker Container
+# Install Javascipt Packages Manager
 #-----------------------------------------------------------------------------
-EXPOSE 3000
+    && ./usr/bin/npm install --global yarn \
+    && ./usr/bin/npm install --global bower \
+    && ./usr/bin/npm install --global grunt \
+    && ./usr/bin/npm install --global gulp \
+    && ./usr/bin/npm install --global yo
 
 #-----------------------------------------------------------------------------
-# Set Volume Application
+# Upgrade Javascipt Packages Manager
 #-----------------------------------------------------------------------------
-VOLUME ["/application", "/root"]
+RUN ./usr/bin/npm upgrade --global chai \
+    && ./usr/bin/npm upgrade --global tv4 \
+    && ./usr/bin/npm upgrade --global newman \
+    && ./usr/bin/npm upgrade --global yarn \
+    && ./usr/bin/npm upgrade --global bower \
+    && ./usr/bin/npm upgrade --global grunt \
+    && ./usr/bin/npm upgrade --global gulp \
+    && ./usr/bin/npm upgrade --global yo
+
+#-----------------------------------------------------------------------------
+# Move 'node_modules' To 'root' Folder
+#-----------------------------------------------------------------------------
+RUN mv /node_modules /root/node_modules
+
+#-----------------------------------------------------------------------------
+# Install Composer PHP Packages Manager
+#-----------------------------------------------------------------------------
+RUN wget https://getcomposer.org/download/${COMPOSER_VERSION}/composer.phar -O /usr/local/bin/composer \
+    && sudo chmod +x /usr/local/bin/composer
 
 #-----------------------------------------------------------------------------
 # Setup TrueColors (Terminal)
@@ -147,6 +245,16 @@ VOLUME ["/application", "/root"]
 COPY ./rootfs/root/colors/24-bit-color.sh /root/colors/24-bit-color.sh
 RUN chmod a+x /root/colors/24-bit-color.sh \
     ./root/colors/24-bit-color.sh
+
+#-----------------------------------------------------------------------------
+# Set PORT Docker Container
+#-----------------------------------------------------------------------------
+EXPOSE 22
+
+#-----------------------------------------------------------------------------
+# Set Volume Docker Workspace
+#-----------------------------------------------------------------------------
+VOLUME [$PATH_WORKSPACE]
 
 #-----------------------------------------------------------------------------
 # Finalize (reconfigure)
@@ -158,3 +266,9 @@ COPY rootfs/ /
 #-----------------------------------------------------------------------------
 ENTRYPOINT ["/init"]
 CMD []
+
+## NOTE:
+## *) Run vim then >> :PluginInstall
+## *) Update plugin vim (vundle) >> :PluginUpdate
+## *) Run in terminal >> vim +PluginInstall +q
+##                       vim +PluginUpdate +q
