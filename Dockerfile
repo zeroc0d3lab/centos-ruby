@@ -199,46 +199,7 @@ COPY ./rootfs/root/Gemfile.lock /root/Gemfile.lock
 COPY ./rootfs/root/gems.sh /root/gems.sh
 RUN chmod a+x /root/gems.sh \
     && cd /root \
-    && /bin/sh gems.sh 
-
-#-----------------------------------------------------------------------------
-# Install Javascipt Unit Test
-#-----------------------------------------------------------------------------
-RUN ./usr/bin/npm install chai \
-    && ./usr/bin/npm install tv4 \
-    && ./usr/bin/npm install newman \
-
-#-----------------------------------------------------------------------------
-# Install Javascipt Packages Manager
-#-----------------------------------------------------------------------------
-    && ./usr/bin/npm install --global yarn \
-    && ./usr/bin/npm install --global bower \
-    && ./usr/bin/npm install --global grunt \
-    && ./usr/bin/npm install --global gulp \
-    && ./usr/bin/npm install --global yo
-
-#-----------------------------------------------------------------------------
-# Upgrade Javascipt Packages Manager
-#-----------------------------------------------------------------------------
-RUN ./usr/bin/npm upgrade --global chai \
-    && ./usr/bin/npm upgrade --global tv4 \
-    && ./usr/bin/npm upgrade --global newman \
-    && ./usr/bin/npm upgrade --global yarn \
-    && ./usr/bin/npm upgrade --global bower \
-    && ./usr/bin/npm upgrade --global grunt \
-    && ./usr/bin/npm upgrade --global gulp \
-    && ./usr/bin/npm upgrade --global yo
-
-#-----------------------------------------------------------------------------
-# Move 'node_modules' To 'root' Folder
-#-----------------------------------------------------------------------------
-RUN mv /node_modules /root/node_modules
-
-#-----------------------------------------------------------------------------
-# Install Composer PHP Packages Manager
-#-----------------------------------------------------------------------------
-RUN wget https://getcomposer.org/download/${COMPOSER_VERSION}/composer.phar -O /usr/local/bin/composer \
-    && sudo chmod +x /usr/local/bin/composer
+    && /bin/sh gems.sh
 
 #-----------------------------------------------------------------------------
 # Setup TrueColors (Terminal)
