@@ -75,7 +75,7 @@ COPY ./rootfs/home/docker/Gemfile.lock /tmp/Gemfile.lock
 # Install Ruby Packages (rbenv/rvm)
 #-----------------------------------------------------------------------------
 COPY ./rootfs/home/docker/gems.sh /tmp/gems.sh
-RUN chmod a+x /tmp/gems.sh \
+RUN chmod a+x /tmp/gems.sh; sync \
     && ./tmp/gems.sh
 
 #-----------------------------------------------------------------------------
