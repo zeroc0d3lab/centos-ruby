@@ -1,4 +1,4 @@
-FROM zeroc0d3lab/centos-base-consul:latest
+FROM zeroc0d3lab/centos-base-workspace-lite:latest
 MAINTAINER ZeroC0D3 Team <zeroc0d3.team@gmail.com>
 
 #-----------------------------------------------------------------------------
@@ -6,137 +6,6 @@ MAINTAINER ZeroC0D3 Team <zeroc0d3.team@gmail.com>
 #-----------------------------------------------------------------------------
 ENV RUBY_VERSION=2.4.2 \
     PATH_WORKSPACE=/home/docker
-
-#-----------------------------------------------------------------------------
-# Set Group & User for 'docker'
-#-----------------------------------------------------------------------------
-RUN mkdir -p ${PATH_WORKSPACE} \
-    && groupadd docker \
-    && useradd -r -g docker docker \
-    && usermod -aG docker docker \
-    && chown -R docker:docker ${PATH_WORKSPACE} \
-    && mkdir -p ${PATH_WORKSPACE}/git-shell-commands \
-    && chmod 755 ${PATH_WORKSPACE}/git-shell-commands
-
-#-----------------------------------------------------------------------------
-# Find Fastest Repo & Update Repo
-#-----------------------------------------------------------------------------
-RUN yum makecache fast \
-    && yum -y update
-
-#-----------------------------------------------------------------------------
-# Install Workspace Dependency (1)
-#-----------------------------------------------------------------------------
-RUN yum -y install \
-           --setopt=tsflags=nodocs \
-           --disableplugin=fastestmirror \
-         git \
-         git-core \
-         zsh \
-         gcc \
-         gcc-c++ \
-         autoconf \
-         automake \
-         make \
-         libevent-devel \
-         ncurses-devel \
-         glibc-static \
-         fontconfig \
-
-#-----------------------------------------------------------------------------
-# Install MySQL (MariaDB) Library
-#-----------------------------------------------------------------------------
-         mysql-devel \
-
-#-----------------------------------------------------------------------------
-# Install PostgreSQL Library
-#-----------------------------------------------------------------------------
-### PostgreSQL 9.2 (default)###
-         postgresql-libs \
-         postgresql-devel \
-
-### PostgreSQL 9.6 ###
-    && rpm -iUvh https://yum.postgresql.org/9.6/redhat/rhel-7-x86_64/pgdg-centos96-9.6-3.noarch.rpm \
-    && yum install -y postgresql96-libs postgresql96-server postgresql96-devel \
-
-#-----------------------------------------------------------------------------
-# Install Workspace Dependency (2)
-#-----------------------------------------------------------------------------
-RUN yum -y install \
-           --setopt=tsflags=nodocs \
-           --disableplugin=fastestmirror \
-         zlib \
-         zlib-devel \
-         patch \
-         readline \
-         readline-devel \
-         libyaml-devel \
-         libffi-devel \
-         openssl-devel \
-         bzip2 \
-         bison \
-         libtool \
-         sqlite-devel
-
-#-----------------------------------------------------------------------------
-# Clean Up All Cache
-#-----------------------------------------------------------------------------
-RUN yum clean all
-
-#-----------------------------------------------------------------------------
-# Download & Install
-# -) bash_it (bash + themes)
-# -) oh-my-zsh (zsh + themes)
-#-----------------------------------------------------------------------------
-RUN rm -rf /root/.bash_it \
-    && rm -rf /root/.oh-my-zsh \
-    && touch /root/.bashrc \
-    && touch /root/.zshrc \
-    && cd /root \
-    && git clone https://github.com/Bash-it/bash-it.git /root/bash_it \
-    && git clone https://github.com/speedenator/agnoster-bash.git /root/bash_it/themes/agnoster-bash \
-    && git clone https://github.com/robbyrussell/oh-my-zsh.git /root/oh-my-zsh \
-    && mv /root/bash_it /root/.bash_it \
-    && mv /root/oh-my-zsh /root/.oh-my-zsh
-
-#-----------------------------------------------------------------------------
-# Download & Install
-# -) tmux + themes
-#-----------------------------------------------------------------------------
-RUN rm -rf /tmp/tmux \
-    && rm -rf /root/.tmux/plugins/tpm \
-    && touch /root/.tmux.conf \
-    && git clone https://github.com/tmux-plugins/tpm.git /root/tmux/plugins/tpm \
-    && git clone https://github.com/tmux/tmux.git /tmp/tmux \
-    && git clone https://github.com/seebi/tmux-colors-solarized.git /root/tmux-colors-solarized \
-    && mv /root/tmux /root/.tmux
-
-RUN cd /tmp/tmux \
-    && /bin/sh autogen.sh \
-    && /bin/sh ./configure \
-    && sudo make \
-    && sudo make install
-
-#-----------------------------------------------------------------------------
-# Install Font Config
-#-----------------------------------------------------------------------------
-RUN mkdir -p /root/.fonts \
-    && mkdir -p /root/.config/fontconfig/conf.d/ \
-    && mkdir -p /usr/share/fonts/local \
-    && wget https://github.com/powerline/powerline/raw/develop/font/PowerlineSymbols.otf -O /root/.fonts/PowerlineSymbols.otf \
-    && wget https://github.com/powerline/powerline/raw/develop/font/10-powerline-symbols.conf -O /root/.config/fontconfig/conf.d/10-powerline-symbols.conf \
-    && cp /root/.fonts/PowerlineSymbols.otf /usr/share/fonts/local/PowerlineSymbols.otf \
-    && cp /root/.fonts/PowerlineSymbols.otf /usr/share/fonts/PowerlineSymbols.otf \
-    && cp /root/.config/fontconfig/conf.d/10-powerline-symbols.conf /etc/fonts/conf.d/10-powerline-symbols.conf \
-    && ./usr/bin/fc-cache -vf /root/.fonts/ \
-    && ./usr/bin/fc-cache -vf /usr/share/fonts
-
-#-----------------------------------------------------------------------------
-# Download & Install
-# -) dircolors (terminal colors)
-#-----------------------------------------------------------------------------
-RUN git clone https://github.com/Anthony25/gnome-terminal-colors-solarized.git /root/solarized \
-    && mv /root/solarized /root/.solarized
 
 #-----------------------------------------------------------------------------
 # Download & Install
@@ -195,24 +64,56 @@ COPY ./rootfs/root/Gemfile.lock /root/Gemfile.lock
 
 USER root
 #-----------------------------------------------------------------------------
+# Change 'root' & 'docker' user Password
+#-----------------------------------------------------------------------------
+# RUN echo 'root:'${SSH_ROOT_PASSWORD} | chpasswd
+RUN echo 'root:docker' | chpasswd \
+    echo 'docker:docker' | chpasswd
+
+#-----------------------------------------------------------------------------
 # Install Ruby Packages (rbenv/rvm)
 #-----------------------------------------------------------------------------
-COPY ./rootfs/root/gems.sh /root/gems.sh
-RUN chmod a+x /root/gems.sh \
-    && cd /root \
-    && /bin/sh gems.sh
+COPY ./rootfs/root/gems.sh $HOME/gems.sh
+RUN chmod a+x $HOME/gems.sh \
+    && /bin/sh $HOME/gems.sh
 
 #-----------------------------------------------------------------------------
-# Setup TrueColors (Terminal)
+# Generate Public Key
 #-----------------------------------------------------------------------------
-COPY ./rootfs/root/colors/24-bit-color.sh /root/colors/24-bit-color.sh
-RUN chmod a+x /root/colors/24-bit-color.sh \
-    ./root/colors/24-bit-color.sh
+# Create new public key
+RUN /usr/bin/ssh-keygen -t rsa -b 4096 -C "zeroc0d3.team@gmail.com" -f $HOME/.ssh/id_rsa
+
+RUN mkdir -p $HOME/.ssh \
+    && touch $HOME/.ssh/authorized_keys \
+    && chmod 700 $HOME/.ssh \
+    && chmod go-w $HOME $HOME/.ssh \
+    && chmod 600 $HOME/.ssh/authorized_keys \
+    && chown `whoami` $HOME/.ssh/authorized_keys \
+    && cat $HOME/.ssh/id_rsa.pub > $HOME/.ssh/authorized_keys
+
+# Create new pem file from public key
+RUN /usr/bin/ssh-keygen -f $HOME/.ssh/id_rsa.pub -e -m pem > $HOME/.ssh/id_rsa.pem
+
+# Create new public key for host
+RUN /usr/bin/ssh-keygen -A
+
+RUN mkdir -p /home/docker/.ssh \
+    && touch /home/docker/.ssh/authorized_keys \
+    && cat $HOME/.ssh/id_rsa.pub > /home/docker/.ssh/authorized_keys \
+    && /usr/bin/ssh-keygen -f $HOME/.ssh/id_rsa.pub -e -m pem > /home/docker/.ssh/id_rsa.pem \
+    && chmod 700 /home/docker/.ssh \
+    && chmod 600 /home/docker/.ssh/authorized_keys \
+    && chmod 600 /home/docker/.ssh/id_rsa*
 
 #-----------------------------------------------------------------------------
-# Set PORT Docker Container
+# Create Workspace Application Folder
 #-----------------------------------------------------------------------------
-EXPOSE 22
+RUN mkdir -p ${PATH_APPLICATION}
+
+#-----------------------------------------------------------------------------
+# Fixing ownership for 'docker' user
+#-----------------------------------------------------------------------------
+RUN chown -R docker:docker ${PATH_WORKSPACE}
 
 #-----------------------------------------------------------------------------
 # Set Volume Docker Workspace
