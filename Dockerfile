@@ -56,11 +56,6 @@ RUN git clone https://github.com/rbenv/rbenv.git /root/.rbenv \
 #     && ./root/.rvm/scripts/rvm use ${RUBY_VERSION} --default
 #     && ./usr/bin/ruby -v
 
-#-----------------------------------------------------------------------------
-# Copy package dependencies in Gemfile
-#-----------------------------------------------------------------------------
-COPY ./rootfs/root/Gemfile /root/Gemfile
-COPY ./rootfs/root/Gemfile.lock /root/Gemfile.lock
 
 USER root
 #-----------------------------------------------------------------------------
@@ -71,11 +66,17 @@ RUN echo 'root:docker' | chpasswd \
     echo 'docker:docker' | chpasswd
 
 #-----------------------------------------------------------------------------
+# Copy package dependencies in Gemfile
+#-----------------------------------------------------------------------------
+COPY ./rootfs/home/docker/Gemfile /tmp/Gemfile
+COPY ./rootfs/home/docker/Gemfile.lock /tmp/Gemfile.lock
+
+#-----------------------------------------------------------------------------
 # Install Ruby Packages (rbenv/rvm)
 #-----------------------------------------------------------------------------
-RUN chmod a+x ./rootfs/root/gems.sh 
-COPY ./rootfs/root/gems.sh $HOME/gems.sh
-RUN ./rootfs/root/gems.sh
+COPY ./rootfs/home/docker/gems.sh /tmp/gems.sh
+RUN chmod a+x /tmp/gems.sh \
+    && ./tmp/gems.sh
 
 #-----------------------------------------------------------------------------
 # Generate Public Key
