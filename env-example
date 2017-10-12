@@ -27,7 +27,7 @@ CONSUL_VERSION=0.8.3
 # ==============================================
 #   RUBY (Environments)
 # ==============================================
-RUBY_VERSION=2.4.2
+RUBY_VERSION=2.4.1
 PATH_WORKSPACE=/home/docker
 RUBY_PORT=2222
 
