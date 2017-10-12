@@ -5,7 +5,8 @@ MAINTAINER ZeroC0D3 Team <zeroc0d3.team@gmail.com>
 # Set Environment
 #-----------------------------------------------------------------------------
 ENV RUBY_VERSION=2.4.1 \
-    PATH_WORKSPACE=/home/docker
+    PATH_HOME=/home/docker \
+    PATH_WORKSPACE=/home/docker/workspace
 
 #-----------------------------------------------------------------------------
 # Download & Install
@@ -108,17 +109,17 @@ RUN mkdir -p /home/docker/.ssh \
 #-----------------------------------------------------------------------------
 # Create Workspace Application Folder
 #-----------------------------------------------------------------------------
-RUN mkdir -p ${PATH_APPLICATION}
+RUN mkdir -p ${PATH_WORKSPACE}
 
 #-----------------------------------------------------------------------------
 # Fixing ownership for 'docker' user
 #-----------------------------------------------------------------------------
-RUN chown -R docker:docker ${PATH_WORKSPACE}
+RUN chown -R docker:docker ${PATH_HOME}
 
 #-----------------------------------------------------------------------------
 # Set Volume Docker Workspace
 #-----------------------------------------------------------------------------
-VOLUME [${PATH_WORKSPACE}, "/root"]
+VOLUME [${PATH_HOME}, "/root"]
 
 #-----------------------------------------------------------------------------
 # Finalize (reconfigure)
