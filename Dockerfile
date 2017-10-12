@@ -68,13 +68,13 @@ RUN echo 'root:docker' | chpasswd \
 #-----------------------------------------------------------------------------
 # Copy package dependencies in Gemfile
 #-----------------------------------------------------------------------------
-COPY ./rootfs/home/docker/Gemfile /tmp/Gemfile
-COPY ./rootfs/home/docker/Gemfile.lock /tmp/Gemfile.lock
+COPY ./rootfs/root/Gemfile /tmp/Gemfile
+COPY ./rootfs/root/Gemfile.lock /tmp/Gemfile.lock
 
 #-----------------------------------------------------------------------------
 # Install Ruby Packages (rbenv/rvm)
 #-----------------------------------------------------------------------------
-COPY ./rootfs/home/docker/gems.sh /tmp/gems.sh
+COPY ./rootfs/root/gems.sh /tmp/gems.sh
 RUN chmod a+x /tmp/gems.sh; sync \
     && ./tmp/gems.sh
 
