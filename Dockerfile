@@ -73,9 +73,9 @@ RUN echo 'root:docker' | chpasswd \
 #-----------------------------------------------------------------------------
 # Install Ruby Packages (rbenv/rvm)
 #-----------------------------------------------------------------------------
+RUN chmod a+x ./rootfs/root/gems.sh 
 COPY ./rootfs/root/gems.sh $HOME/gems.sh
-RUN chmod a+x $HOME/gems.sh \
-    && /bin/sh $HOME/gems.sh
+RUN ./rootfs/root/gems.sh
 
 #-----------------------------------------------------------------------------
 # Generate Public Key
