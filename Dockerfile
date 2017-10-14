@@ -13,22 +13,22 @@ ENV RUBY_VERSION=2.4.2 \
 # -) vim
 # -) vundle + themes
 #-----------------------------------------------------------------------------
-RUN git clone https://github.com/vim/vim.git /root/vim
+RUN git clone https://github.com/vim/vim.git /opt/vim
 
-RUN cd /root/vim/src \
+RUN cd /opt/vim/src \
     && /bin/sh ./configure \
     && sudo make \
     && sudo make install \
     && sudo mkdir /usr/share/vim \
     && sudo mkdir /usr/share/vim/vim80/ \
-    && sudo cp -fr /root/vim/runtime/* /usr/share/vim/vim80/ \
-    && git clone https://github.com/zeroc0d3/vim-ide.git /root/vim-ide \
-    && /bin/sh /root/vim-ide/step02.sh
+    && sudo cp -fr /opt/vim/runtime/* /usr/share/vim/vim80/ \
+    && git clone https://github.com/zeroc0d3/vim-ide.git /opt/vim-ide \
+    && /bin/sh /opt/vim-ide/step02.sh
 
-RUN git clone https://github.com/dracula/vim.git /tmp/themes/dracula \
-    && git clone https://github.com/blueshirts/darcula.git /tmp/themes/darcula \
-    && sudo cp /tmp/themes/dracula/colors/dracula.vim /root/.vim/bundle/vim-colors/colors/dracula.vim \
-    && sudo cp /tmp/themes/darcula/colors/darcula.vim /root/.vim/bundle/vim-colors/colors/darcula.vim
+RUN git clone https://github.com/dracula/vim.git /opt/vim-themes/dracula \
+    && git clone https://github.com/blueshirts/darcula.git /opt/vim-themes/darcula \
+    && sudo cp /opt/vim-themes/dracula/colors/dracula.vim $HOME/.vim/bundle/vim-colors/colors/dracula.vim \
+    && sudo cp /opt/vim-themes/darcula/colors/darcula.vim $HOME/.vim/bundle/vim-colors/colors/darcula.vim
 
 #-----------------------------------------------------------------------------
 # Prepare Install Ruby
@@ -41,23 +41,23 @@ COPY ./rootfs/root/.bashrc /root/.bashrc
 #-----------------------------------------------------------------------------
 # Install Ruby with rbenv (default)
 #-----------------------------------------------------------------------------
-RUN git clone https://github.com/rbenv/rbenv.git /root/.rbenv \
-    && git clone https://github.com/rbenv/ruby-build.git /root/.rbenv/plugins/ruby-build \
-    && ./root/.rbenv/bin/rbenv install ${RUBY_VERSION} \
-    && ./root/.rbenv/bin/rbenv global ${RUBY_VERSION} \
-    && ./root/.rbenv/bin/rbenv rehash \
-    && ./root/.rbenv/shims/ruby -v
+RUN git clone https://github.com/rbenv/rbenv.git /usr/local/rbenv \
+    && git clone https://github.com/rbenv/ruby-build.git /usr/local/rbenv/plugins/ruby-build \
+    && ./usr/local/rbenv/bin/rbenv install ${RUBY_VERSION} \
+    && ./usr/local/rbenv/bin/rbenv global ${RUBY_VERSION} \
+    && ./usr/local/rbenv/bin/rbenv rehash \
+    && ./usr/local/rbenv/shims/ruby -v
 
 #-----------------------------------------------------------------------------
 # Install Ruby with rvm (alternatives)
 #-----------------------------------------------------------------------------
 # RUN gpg --keyserver hkp://keys.gnupg.net --recv-keys 409B6B1796C275462A1703113804BB82D39DC0E3 \
-#     && curl -sSL https://get.rvm.io | bash -s stable \
-#     && ./root/.rvm/scripts/rvm install ${RUBY_VERSION} \
-#     && ./root/.rvm/scripts/rvm use ${RUBY_VERSION} --default
+#     && curl -sSL https://get.rvm.io | sudo bash -s stable \
+#     && sudo usermod -a -G rvm docker \
+#     && ./usr/local/rvm/scripts/rvm install ${RUBY_VERSION} \
+#     && ./usr/local/rvm/scripts/rvm use ${RUBY_VERSION} --default
 #     && ./usr/bin/ruby -v
 
-USER root
 #-----------------------------------------------------------------------------
 # Change 'root' & 'docker' user Password
 #-----------------------------------------------------------------------------
@@ -68,15 +68,16 @@ RUN echo 'root:docker' | chpasswd \
 #-----------------------------------------------------------------------------
 # Copy package dependencies in Gemfile
 #-----------------------------------------------------------------------------
-COPY ./rootfs/root/Gemfile /tmp/Gemfile
-COPY ./rootfs/root/Gemfile.lock /tmp/Gemfile.lock
+COPY ./rootfs/root/Gemfile /opt/Gemfile
+COPY ./rootfs/root/Gemfile.lock /opt/Gemfile.lock
 
 #-----------------------------------------------------------------------------
 # Install Ruby Packages (rbenv/rvm)
 #-----------------------------------------------------------------------------
-# COPY ./rootfs/root/gems.sh /tmp/gems.sh
-# RUN chmod a+x /tmp/gems.sh; sync \
-#     && ./tmp/gems.sh
+COPY ./rootfs/root/gems.sh /opt/gems.sh
+# RUN chmod 777 /opt/gems.sh; sync \
+#     chmod a+x /opt/gems.sh; sync \
+#     && ./opt/gems.sh
 
 #-----------------------------------------------------------------------------
 # Generate Public Key
