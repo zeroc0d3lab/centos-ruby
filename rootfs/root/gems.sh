@@ -15,7 +15,6 @@ logo() {
 }
 
 load_env() {
-  echo ""
   echo "--------------------------------------------------------------------------"
   echo "## Load Environment: "
   echo "   $HOME/.bashrc"
@@ -23,7 +22,6 @@ load_env() {
 }
 
 check(){
-  echo ""
   echo "--------------------------------------------------------------------------"
   echo "## Ruby Version: "
   RUBY=`which ruby`
@@ -39,7 +37,6 @@ check(){
 }
 
 install_bundle() {
-  echo ""
   echo "--------------------------------------------------------------------------"
   echo "## Install Bundle: "
   echo "   $GEM install bundle"
@@ -47,7 +44,6 @@ install_bundle() {
 }
 
 install_package() {
-  echo ""
   echo "--------------------------------------------------------------------------"
   echo "## Install Package: "
   BUNDLE=`which bundle`

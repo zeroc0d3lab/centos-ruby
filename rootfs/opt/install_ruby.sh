@@ -17,12 +17,12 @@ logo() {
 
 check_version() {
   if [ "${RUBY_VERSION}" = "" ]
+  then
     ${RUBY_VERSION} = $DEFAULT_VERSION
   fi
 }
 
 load_env() {
-  echo ""
   echo "--------------------------------------------------------------------------"
   echo "## Load Environment: "
   echo "   $HOME/.bashrc"
@@ -57,7 +57,6 @@ install_ruby() {
 }
 
 check(){
-  echo ""
   echo "--------------------------------------------------------------------------"
   echo "## Ruby Version: "
   RUBY=`which ruby`
@@ -73,7 +72,6 @@ check(){
 }
 
 install_bundle() {
-  echo ""
   echo "--------------------------------------------------------------------------"
   echo "## Install Bundle: "
   echo "   $GEM install bundle"
@@ -82,7 +80,7 @@ install_bundle() {
 
 main() {
   logo
-  check_version
+  #check_version
   install_ruby
   load_env
   check
