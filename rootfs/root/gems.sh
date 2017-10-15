@@ -3,7 +3,9 @@
 RUBY=`which ruby`
 RUBY_V=`ruby -v`
 GEM=`which gem`
-BUNDLER=`which bundler`
+BUNDLE=`which bundle`
+
+source $HOME/.bashrc
 
 echo '-------------------------------------------------------------'
 echo '## Ruby version: '
@@ -19,5 +21,5 @@ echo ''
 echo 'Begin Installation'
 echo '-------------------------------------------------------------'
 
-$GEM install bundler
-$BUNDLER install
+$GEM install bundle
+$BUNDLE install

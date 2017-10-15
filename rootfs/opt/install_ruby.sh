@@ -1,9 +1,11 @@
 #!/bin/sh
 
-RUBY_PACKAGE="rbenv"
-# ("rbenv" = using rbenv package manager, "rvm" = using rvm package manager)
+RUBY=`which ruby`
+RUBY_V=`ruby -v`
+GEM=`which gem`
+BUNDLE=`which bundle`
 
-if [ "$RUBY_PACKAGE" = "rbenv" ]
+if [ "${RUBY_PACKAGE}" = "rbenv" ]
 then
   #-----------------------------------------------------------------------------
   # Install Ruby with rbenv (default)
@@ -22,8 +24,12 @@ else
     && curl -sSL https://get.rvm.io | sudo bash -s stable \
     && sudo usermod -a -G rvm root \
     && sudo usermod -a -G rvm docker \
-    && source ~/.bashrc \
+    && source $HOME/.bashrc \
     && /usr/local/rvm/bin/rvm install ${RUBY_VERSION} \
     && /usr/local/rvm/bin/rvm use ${RUBY_VERSION} --default \
     && /usr/bin/ruby -v
 fi
+
+source $HOME/.bashrc
+
+$GEM install bundle

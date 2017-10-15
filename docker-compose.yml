@@ -22,6 +22,7 @@ services:
     environment:
       - RUBY_VERSION=${RUBY_VERSION}
       - PATH_WORKSPACE=${PATH_WORKSPACE}
+      - RUBY_PACKAGE=${RUBY_PACKAGE}
     networks:
       - frontend
       - backend

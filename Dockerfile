@@ -8,6 +8,9 @@ ENV RUBY_VERSION=2.4.2 \
     PATH_HOME=/home/docker \
     PATH_WORKSPACE=/home/docker/workspace
 
+ENV RUBY_PACKAGE="rbenv"
+    # ("rbenv" = using rbenv package manager, "rvm" = using rvm package manager)
+
 USER root
 #-----------------------------------------------------------------------------
 # Download & Install
@@ -53,9 +56,7 @@ COPY ./rootfs/root/Gemfile.lock /opt/Gemfile.lock
 # Install Ruby Packages (rbenv/rvm)
 #-----------------------------------------------------------------------------
 COPY ./rootfs/root/gems.sh /opt/gems.sh
-RUN chmod 777 /opt/gems.sh; sync \
-    && chmod a+x /opt/gems.sh; sync \
-    && /bin/sh /opt/gems.sh
+RUN /opt/gems.sh
 
 # -----------------------------------------------------------------------------
 # UTC Timezone & Networking
