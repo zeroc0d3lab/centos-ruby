@@ -51,6 +51,8 @@ RUN cd /opt \
     && cp /opt/rbenv.tar.gz /usr/local \
     && cd /usr/local \
     && tar zxvf rbenv.tar.gz
+RUN source ~/.bashrc \
+    && exec -l $SHELL
 RUN cd /usr/local/rbenv/bin \
     && rbenv install ${RUBY_VERSION} \
     && rbenv global ${RUBY_VERSION} \
@@ -66,8 +68,10 @@ RUN cd /usr/local/rbenv/bin \
 # RUN gpg --keyserver hkp://keys.gnupg.net --recv-keys 409B6B1796C275462A1703113804BB82D39DC0E3 \
 #     && curl -sSL https://get.rvm.io | sudo bash -s stable \
 #     && sudo usermod -a -G rvm root \
-#     && sudo usermod -a -G rvm docker \
-#     && cd /usr/local/rvm/scripts \
+#     && sudo usermod -a -G rvm docker
+# RUN source ~/.bashrc \
+#     && exec -l $SHELL
+# RUN cd /usr/local/rvm/scripts \
 #     && rvm install ${RUBY_VERSION} \
 #     && rvm use ${RUBY_VERSION} --default \
 #     && cd /usr/bin \
