@@ -19,6 +19,7 @@ load_env() {
   echo "## Load Environment: "
   echo "   $HOME/.bashrc"
   source ~/.bashrc
+  exec $SHELL
 }
 
 check(){

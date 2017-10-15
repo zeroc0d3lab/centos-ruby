@@ -27,6 +27,7 @@ load_env() {
   echo "## Load Environment: "
   echo "   $HOME/.bashrc"
   source ~/.bashrc
+  exec $SHELL
 }
 
 install_ruby() {
@@ -37,7 +38,7 @@ install_ruby() {
     #-----------------------------------------------------------------------------
     git clone https://github.com/rbenv/rbenv.git $HOME/.rbenv \
     && git clone https://github.com/rbenv/ruby-build.git $HOME/.rbenv/plugins/ruby-build \
-    && source ~/.bashrc \
+    && exec $SHELL \
     && $HOME/.rbenv/bin/rbenv install ${RUBY_VERSION} \
     && $HOME/.rbenv/bin/rbenv global ${RUBY_VERSION} \
     && $HOME/.rbenv/bin/rbenv rehash \
