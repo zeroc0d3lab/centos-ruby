@@ -2,10 +2,6 @@
 
 DATE=`date '+%Y-%m-%d %H:%M:%S'`
 DEFAULT_VERSION='2.4.2'
-RUBY=`which ruby`
-RUBY_V=`$RUBY -v`
-GEM=`which gem`
-BUNDLE=`which bundle`
 
 logo() {
   echo "--------------------------------------------------------------------------"
@@ -64,12 +60,15 @@ check(){
   echo ""
   echo "--------------------------------------------------------------------------"
   echo "## Ruby Version: "
+  RUBY=`which ruby`
+  RUBY_V=`$RUBY -v`
   echo "   $RUBY_V"
   echo "--------------------------------------------------------------------------"
   echo "## Path Ruby: "
   echo "   $RUBY"
   echo "--------------------------------------------------------------------------"
   echo "## Path Gem: "
+  GEM=`which gem`
   echo "   $GEM"
 }
 
