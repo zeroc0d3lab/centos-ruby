@@ -89,7 +89,7 @@ RUN ln -sf \
 #-----------------------------------------------------------------------------
 # RUN echo 'root:'${SSH_ROOT_PASSWORD} | chpasswd
 RUN echo 'root:docker' | chpasswd \
-    echo 'docker:docker' | chpasswd
+    && echo 'docker:docker' | chpasswd
 
 #-----------------------------------------------------------------------------
 # Generate Public Key
