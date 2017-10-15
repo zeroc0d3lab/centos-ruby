@@ -41,7 +41,7 @@ COPY ./rootfs/root/.zshrc /root/.zshrc
 COPY ./rootfs/root/.bashrc /root/.bashrc
 COPY ./rootfs/opt/ruby.sh /etc/profile.d/ruby.sh
 COPY ./rootfs/opt/install_ruby.sh /opt/install_ruby.sh
-RUN ./opt/install_ruby.sh
+RUN /opt/install_ruby.sh
 
 #-----------------------------------------------------------------------------
 # Copy package dependencies in Gemfile
