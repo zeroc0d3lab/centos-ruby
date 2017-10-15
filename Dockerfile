@@ -8,6 +8,7 @@ ENV RUBY_VERSION=2.4.2 \
     PATH_HOME=/home/docker \
     PATH_WORKSPACE=/home/docker/workspace
 
+USER root
 #-----------------------------------------------------------------------------
 # Download & Install
 # -) vim
@@ -43,14 +44,20 @@ COPY ./rootfs/root/.bashrc /root/.bashrc
 # Install Ruby with rbenv (default)
 #-----------------------------------------------------------------------------
 COPY ./rootfs/opt/rbenv.sh /etc/profile.d/rbenv.sh
-RUN git clone https://github.com/rbenv/rbenv.git /usr/local/rbenv \
-    && git clone https://github.com/rbenv/ruby-build.git /usr/local/rbenv/plugins/ruby-build \
-    && cd /usr/local/rbenv/bin \
+RUN git clone https://github.com/rbenv/rbenv.git /opt/rbenv \
+    && git clone https://github.com/rbenv/ruby-build.git /opt/rbenv/plugins/ruby-build
+RUN cd /opt \
+    && tar zcvf rbenv.tar.gz rbenv \
+    && cp /opt/rbenv.tar.gz /usr/local \
+    && cd /usr/local \
+    && tar zxvf rbenv.tar.gz
+RUN cd /usr/local/rbenv/bin \
     && rbenv install ${RUBY_VERSION} \
     && rbenv global ${RUBY_VERSION} \
     && rbenv rehash \
     && cd /usr/local/rbenv/shims \
-    && ruby -v
+    && ruby -v \
+    && rm -f /opt/rbenv.tar.gz
 
 #-----------------------------------------------------------------------------
 # Install Ruby with rvm (alternatives)
