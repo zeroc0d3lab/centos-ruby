@@ -66,6 +66,7 @@ RUN ln -sf \
 		/etc/localtime \
 	&& echo "NETWORKING=yes" > /etc/sysconfig/network
 
+USER root
 #-----------------------------------------------------------------------------
 # Change 'root' & 'docker' user Password
 #-----------------------------------------------------------------------------
@@ -77,7 +78,7 @@ RUN echo 'root:docker' | chpasswd \
 # Generate Public Key
 #-----------------------------------------------------------------------------
 # Create new public key
-RUN /usr/bin/ssh-keygen -t rsa -b 4096 -C "zeroc0d3.team@gmail.com" -f $HOME/.ssh/id_rsa
+RUN /usr/bin/ssh-keygen -t rsa -b 4096 -C "zeroc0d3.team@gmail.com" -f $HOME/.ssh/id_rsa -q -N ""
 
 RUN mkdir -p $HOME/.ssh \
     && touch $HOME/.ssh/authorized_keys \
