@@ -27,6 +27,7 @@ RUN cd /opt/vim/src \
 
 RUN git clone https://github.com/dracula/vim.git /opt/vim-themes/dracula \
     && git clone https://github.com/blueshirts/darcula.git /opt/vim-themes/darcula \
+    && mkdir -p $HOME/.vim/bundle/vim-colors/colors \
     && sudo cp /opt/vim-themes/dracula/colors/dracula.vim $HOME/.vim/bundle/vim-colors/colors/dracula.vim \
     && sudo cp /opt/vim-themes/darcula/colors/darcula.vim $HOME/.vim/bundle/vim-colors/colors/darcula.vim
 
@@ -41,6 +42,7 @@ COPY ./rootfs/root/.bashrc /root/.bashrc
 #-----------------------------------------------------------------------------
 # Install Ruby with rbenv (default)
 #-----------------------------------------------------------------------------
+COPY ./rootfs/opt/rbenv.sh /etc/profile.d/rbenv.sh
 RUN git clone https://github.com/rbenv/rbenv.git /usr/local/rbenv \
     && git clone https://github.com/rbenv/ruby-build.git /usr/local/rbenv/plugins/ruby-build \
     && ./usr/local/rbenv/bin/rbenv install ${RUBY_VERSION} \
@@ -51,19 +53,14 @@ RUN git clone https://github.com/rbenv/rbenv.git /usr/local/rbenv \
 #-----------------------------------------------------------------------------
 # Install Ruby with rvm (alternatives)
 #-----------------------------------------------------------------------------
+# COPY ./rootfs/opt/rvm.sh /etc/profile.d/rvm.sh
 # RUN gpg --keyserver hkp://keys.gnupg.net --recv-keys 409B6B1796C275462A1703113804BB82D39DC0E3 \
 #     && curl -sSL https://get.rvm.io | sudo bash -s stable \
+#     && sudo usermod -a -G rvm root \
 #     && sudo usermod -a -G rvm docker \
 #     && ./usr/local/rvm/scripts/rvm install ${RUBY_VERSION} \
 #     && ./usr/local/rvm/scripts/rvm use ${RUBY_VERSION} --default
 #     && ./usr/bin/ruby -v
-
-#-----------------------------------------------------------------------------
-# Change 'root' & 'docker' user Password
-#-----------------------------------------------------------------------------
-# RUN echo 'root:'${SSH_ROOT_PASSWORD} | chpasswd
-RUN echo 'root:docker' | chpasswd \
-    echo 'docker:docker' | chpasswd
 
 #-----------------------------------------------------------------------------
 # Copy package dependencies in Gemfile
@@ -78,6 +75,21 @@ COPY ./rootfs/root/gems.sh /opt/gems.sh
 # RUN chmod 777 /opt/gems.sh; sync \
 #     chmod a+x /opt/gems.sh; sync \
 #     && ./opt/gems.sh
+
+# -----------------------------------------------------------------------------
+# UTC Timezone & Networking
+# -----------------------------------------------------------------------------
+RUN ln -sf \
+		/usr/share/zoneinfo/UTC \
+		/etc/localtime \
+	&& echo "NETWORKING=yes" > /etc/sysconfig/network
+
+#-----------------------------------------------------------------------------
+# Change 'root' & 'docker' user Password
+#-----------------------------------------------------------------------------
+# RUN echo 'root:'${SSH_ROOT_PASSWORD} | chpasswd
+RUN echo 'root:docker' | chpasswd \
+    echo 'docker:docker' | chpasswd
 
 #-----------------------------------------------------------------------------
 # Generate Public Key
