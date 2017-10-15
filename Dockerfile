@@ -41,32 +41,8 @@ RUN git clone https://github.com/dracula/vim.git /opt/vim-themes/dracula \
 COPY ./rootfs/root/.zshrc /root/.zshrc
 COPY ./rootfs/root/.bashrc /root/.bashrc
 COPY ./rootfs/opt/ruby.sh /etc/profile.d/ruby.sh
-
-
-if [ ${RUBY_PACKAGE} = "rbenv" ]
-then
-  #-----------------------------------------------------------------------------
-  # Install Ruby with rbenv (default)
-  #-----------------------------------------------------------------------------
-  RUN git clone https://github.com/rbenv/rbenv.git $HOME/.rbenv \
-      && git clone https://github.com/rbenv/ruby-build.git $HOME/.rbenv/plugins/ruby-build \
-      && $HOME/.rbenv/bin/rbenv install ${RUBY_VERSION} \
-      && $HOME/.rbenv/bin/rbenv global ${RUBY_VERSION} \
-      && $HOME/.rbenv/bin/rbenv rehash \
-      && $HOME/.rbenv/shims/ruby -v
-else
-  #-----------------------------------------------------------------------------
-  # Install Ruby with rvm (alternatives)
-  #-----------------------------------------------------------------------------
-  RUN gpg --keyserver hkp://keys.gnupg.net --recv-keys 409B6B1796C275462A1703113804BB82D39DC0E3 \
-      && curl -sSL https://get.rvm.io | sudo bash -s stable \
-      && sudo usermod -a -G rvm root \
-      && sudo usermod -a -G rvm docker \
-      && source ~/.bashrc \
-      && /usr/local/rvm/bin/rvm install ${RUBY_VERSION} \
-      && /usr/local/rvm/bin/rvm use ${RUBY_VERSION} --default \
-      && /usr/bin/ruby -v
-fi
+COPY ./rootfs/opt/install_ruby.sh /opt/install_ruby.sh
+RUN /opt/install_ruby.sh
 
 #-----------------------------------------------------------------------------
 # Copy package dependencies in Gemfile
@@ -78,9 +54,9 @@ COPY ./rootfs/root/Gemfile.lock /opt/Gemfile.lock
 # Install Ruby Packages (rbenv/rvm)
 #-----------------------------------------------------------------------------
 COPY ./rootfs/root/gems.sh /opt/gems.sh
-# RUN chmod 777 /opt/gems.sh; sync \
-#     chmod a+x /opt/gems.sh; sync \
-#     && ./opt/gems.sh
+RUN chmod 777 /opt/gems.sh; sync \
+    && chmod a+x /opt/gems.sh; sync \
+    && /bin/sh /opt/gems.sh
 
 # -----------------------------------------------------------------------------
 # UTC Timezone & Networking
