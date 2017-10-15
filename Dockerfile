@@ -7,6 +7,7 @@ MAINTAINER ZeroC0D3 Team <zeroc0d3.team@gmail.com>
 ENV RUBY_VERSION=2.4.2 \
     PATH_HOME=/home/docker \
     PATH_WORKSPACE=/home/docker/workspace
+    RUBY_PACKAGE=rbenv                         # ("rbenv" or "rvm")
 
 USER root
 #-----------------------------------------------------------------------------
@@ -39,43 +40,33 @@ RUN git clone https://github.com/dracula/vim.git /opt/vim-themes/dracula \
 #-----------------------------------------------------------------------------
 COPY ./rootfs/root/.zshrc /root/.zshrc
 COPY ./rootfs/root/.bashrc /root/.bashrc
+COPY ./rootfs/opt/ruby.sh /etc/profile.d/ruby.sh
 
-#-----------------------------------------------------------------------------
-# Install Ruby with rbenv (default)
-#-----------------------------------------------------------------------------
-COPY ./rootfs/opt/rbenv.sh /etc/profile.d/rbenv.sh
-RUN git clone https://github.com/rbenv/rbenv.git /opt/rbenv \
-    && git clone https://github.com/rbenv/ruby-build.git /opt/rbenv/plugins/ruby-build
-RUN cd /opt \
-    && tar zcvf rbenv.tar.gz rbenv \
-    && cp /opt/rbenv.tar.gz /usr/local \
-    && cd /usr/local \
-    && tar zxvf rbenv.tar.gz
-RUN source ~/.bashrc \
-    && exec -l $SHELL
-RUN cd /usr/local/rbenv/bin \
-    && rbenv install ${RUBY_VERSION} \
-    && rbenv global ${RUBY_VERSION} \
-    && rbenv rehash \
-    && cd /usr/local/rbenv/shims \
-    && ruby -v \
-    && rm -f /opt/rbenv.tar.gz
 
-#-----------------------------------------------------------------------------
-# Install Ruby with rvm (alternatives)
-#-----------------------------------------------------------------------------
-# COPY ./rootfs/opt/rvm.sh /etc/profile.d/rvm.sh
-# RUN gpg --keyserver hkp://keys.gnupg.net --recv-keys 409B6B1796C275462A1703113804BB82D39DC0E3 \
-#     && curl -sSL https://get.rvm.io | sudo bash -s stable \
-#     && sudo usermod -a -G rvm root \
-#     && sudo usermod -a -G rvm docker
-# RUN source ~/.bashrc \
-#     && exec -l $SHELL
-# RUN cd /usr/local/rvm/scripts \
-#     && rvm install ${RUBY_VERSION} \
-#     && rvm use ${RUBY_VERSION} --default \
-#     && cd /usr/bin \
-#     && ruby -v
+if [ ${RUBY_PACKAGE} = "rbenv" ]
+then
+  #-----------------------------------------------------------------------------
+  # Install Ruby with rbenv (default)
+  #-----------------------------------------------------------------------------
+  RUN git clone https://github.com/rbenv/rbenv.git $HOME/.rbenv \
+      && git clone https://github.com/rbenv/ruby-build.git $HOME/.rbenv/plugins/ruby-build \
+      && $HOME/.rbenv/bin/rbenv install ${RUBY_VERSION} \
+      && $HOME/.rbenv/bin/rbenv global ${RUBY_VERSION} \
+      && $HOME/.rbenv/bin/rbenv rehash \
+      && $HOME/.rbenv/shims/ruby -v
+else
+  #-----------------------------------------------------------------------------
+  # Install Ruby with rvm (alternatives)
+  #-----------------------------------------------------------------------------
+  RUN gpg --keyserver hkp://keys.gnupg.net --recv-keys 409B6B1796C275462A1703113804BB82D39DC0E3 \
+      && curl -sSL https://get.rvm.io | sudo bash -s stable \
+      && sudo usermod -a -G rvm root \
+      && sudo usermod -a -G rvm docker \
+      && source ~/.bashrc \
+      && /usr/local/rvm/bin/rvm install ${RUBY_VERSION} \
+      && /usr/local/rvm/bin/rvm use ${RUBY_VERSION} --default \
+      && /usr/bin/ruby -v
+fi
 
 #-----------------------------------------------------------------------------
 # Copy package dependencies in Gemfile
