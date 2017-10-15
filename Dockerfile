@@ -6,7 +6,7 @@ MAINTAINER ZeroC0D3 Team <zeroc0d3.team@gmail.com>
 #-----------------------------------------------------------------------------
 ENV RUBY_VERSION=2.4.2 \
     PATH_HOME=/home/docker \
-    PATH_WORKSPACE=/home/docker/workspace
+    PATH_WORKSPACE=/home/docker/workspace \
     RUBY_PACKAGE=rbenv                         # ("rbenv" or "rvm")
 
 USER root
