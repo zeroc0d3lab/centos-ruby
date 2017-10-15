@@ -78,26 +78,26 @@ RUN echo 'root:docker' | chpasswd \
 # Generate Public Key
 #-----------------------------------------------------------------------------
 # Create new public key
-RUN /usr/bin/ssh-keygen -t rsa -b 4096 -C "zeroc0d3.team@gmail.com" -f $HOME/.ssh/id_rsa -q -N ""
+RUN mkdir -p /root/.ssh \
+    && /usr/bin/ssh-keygen -t rsa -b 4096 -C "zeroc0d3.team@gmail.com" -f /root/.ssh/id_rsa -q -N ""; sync
 
-RUN mkdir -p $HOME/.ssh \
-    && touch $HOME/.ssh/authorized_keys \
-    && chmod 700 $HOME/.ssh; sync \
-    && chmod go-w $HOME $HOME/.ssh; sync \
-    && chmod 600 $HOME/.ssh/authorized_keys; sync \
-    && chown `whoami` $HOME/.ssh/authorized_keys; sync \
-    && cat $HOME/.ssh/id_rsa.pub > $HOME/.ssh/authorized_keys
+RUN touch /root/.ssh/authorized_keys \
+    && chmod 700 /root/.ssh; sync \
+    && chmod go-w /root /root/.ssh; sync \
+    && chmod 600 /root/.ssh/authorized_keys; sync \
+    && chown `whoami` /root/.ssh/authorized_keys; sync \
+    && cat /root/.ssh/id_rsa.pub > /root/.ssh/authorized_keys
 
 # Create new pem file from public key
-RUN /usr/bin/ssh-keygen -f $HOME/.ssh/id_rsa.pub -e -m pem > $HOME/.ssh/id_rsa.pem
+RUN /usr/bin/ssh-keygen -f /root/.ssh/id_rsa.pub -e -m pem > /root/.ssh/id_rsa.pem
 
 # Create new public key for host
 RUN /usr/bin/ssh-keygen -A
 
 RUN mkdir -p /home/docker/.ssh \
     && touch /home/docker/.ssh/authorized_keys \
-    && cat $HOME/.ssh/id_rsa.pub > /home/docker/.ssh/authorized_keys \
-    && /usr/bin/ssh-keygen -f $HOME/.ssh/id_rsa.pub -e -m pem > /home/docker/.ssh/id_rsa.pem \
+    && cat /root/.ssh/id_rsa.pub > /home/docker/.ssh/authorized_keys \
+    && /usr/bin/ssh-keygen -f /root/.ssh/id_rsa.pub -e -m pem > /home/docker/.ssh/id_rsa.pem \
     && chmod 700 /home/docker/.ssh; sync \
     && chmod 600 /home/docker/.ssh/authorized_keys; sync \
     && chmod 600 /home/docker/.ssh/id_rsa*; sync
