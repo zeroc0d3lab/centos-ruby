@@ -99,10 +99,10 @@ RUN /usr/bin/ssh-keygen -t rsa -b 4096 -C "zeroc0d3.team@gmail.com" -f $HOME/.ss
 
 RUN mkdir -p $HOME/.ssh \
     && touch $HOME/.ssh/authorized_keys \
-    && chmod 700 $HOME/.ssh \
-    && chmod go-w $HOME $HOME/.ssh \
-    && chmod 600 $HOME/.ssh/authorized_keys \
-    && chown `whoami` $HOME/.ssh/authorized_keys \
+    && chmod 700 $HOME/.ssh; sync \
+    && chmod go-w $HOME $HOME/.ssh; sync \
+    && chmod 600 $HOME/.ssh/authorized_keys; sync \
+    && chown `whoami` $HOME/.ssh/authorized_keys; sync \
     && cat $HOME/.ssh/id_rsa.pub > $HOME/.ssh/authorized_keys
 
 # Create new pem file from public key
@@ -115,9 +115,9 @@ RUN mkdir -p /home/docker/.ssh \
     && touch /home/docker/.ssh/authorized_keys \
     && cat $HOME/.ssh/id_rsa.pub > /home/docker/.ssh/authorized_keys \
     && /usr/bin/ssh-keygen -f $HOME/.ssh/id_rsa.pub -e -m pem > /home/docker/.ssh/id_rsa.pem \
-    && chmod 700 /home/docker/.ssh \
-    && chmod 600 /home/docker/.ssh/authorized_keys \
-    && chmod 600 /home/docker/.ssh/id_rsa*
+    && chmod 700 /home/docker/.ssh; sync \
+    && chmod 600 /home/docker/.ssh/authorized_keys; sync \
+    && chmod 600 /home/docker/.ssh/id_rsa*; sync
 
 #-----------------------------------------------------------------------------
 # Create Workspace Application Folder
