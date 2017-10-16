@@ -11,7 +11,11 @@ ENV RUBY_VERSION=2.4.2 \
 ENV RUBY_PACKAGE="rbenv"
     # ("rbenv" = using rbenv package manager, "rvm" = using rvm package manager)
 
-USER root
+#-----------------------------------------------------------------------------
+# Set Configuration
+#-----------------------------------------------------------------------------
+COPY rootfs/ /
+
 #-----------------------------------------------------------------------------
 # Download & Install
 # -) vim
@@ -40,10 +44,10 @@ RUN git clone https://github.com/dracula/vim.git /opt/vim-themes/dracula \
 # -) copy .zshrc to /root
 # -) copy .bashrc to /root
 #-----------------------------------------------------------------------------
-COPY ./rootfs/root/.zshrc /root/.zshrc
-COPY ./rootfs/root/.bashrc /root/.bashrc
-COPY ./rootfs/opt/ruby.sh /etc/profile.d/ruby.sh
-COPY ./rootfs/opt/install_ruby.sh /opt/install_ruby.sh
+# COPY ./rootfs/root/.zshrc /root/.zshrc
+# COPY ./rootfs/root/.bashrc /root/.bashrc
+# COPY ./rootfs/opt/ruby.sh /etc/profile.d/ruby.sh
+# COPY ./rootfs/opt/install_ruby.sh /opt/install_ruby.sh
 RUN /opt/install_ruby.sh
 
 #-----------------------------------------------------------------------------
@@ -116,11 +120,6 @@ RUN chown -R docker:docker ${PATH_HOME}
 # Set Volume Docker Workspace
 #-----------------------------------------------------------------------------
 VOLUME ["/home/docker", "/home/docker/workspace", "/root"]
-
-#-----------------------------------------------------------------------------
-# Finalize (reconfigure)
-#-----------------------------------------------------------------------------
-COPY rootfs/ /
 
 #-----------------------------------------------------------------------------
 # Run Init Docker Container
