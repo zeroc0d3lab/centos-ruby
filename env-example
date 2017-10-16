@@ -32,6 +32,7 @@ RUBY_VERSION=2.4.1
 PATH_WORKSPACE=/home/docker
 =======
 RUBY_VERSION=2.4.2
+RUBY_PACKAGE=rbenv
 PATH_HOME=/home/docker
 PATH_WORKSPACE=/home/docker/workspace
 >>>>>>> master

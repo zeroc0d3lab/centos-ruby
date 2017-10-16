@@ -8,6 +8,14 @@ ENV RUBY_VERSION=2.4.1 \
     PATH_HOME=/home/docker \
     PATH_WORKSPACE=/home/docker/workspace
 
+ENV RUBY_PACKAGE="rbenv"
+    # ("rbenv" = using rbenv package manager, "rvm" = using rvm package manager)
+
+#-----------------------------------------------------------------------------
+# Set Configuration
+#-----------------------------------------------------------------------------
+COPY rootfs/ /
+
 #-----------------------------------------------------------------------------
 # Download & Install
 # -) vim
@@ -36,35 +44,11 @@ RUN git clone https://github.com/dracula/vim.git /opt/vim-themes/dracula \
 # -) copy .zshrc to /root
 # -) copy .bashrc to /root
 #-----------------------------------------------------------------------------
-COPY ./rootfs/root/.zshrc /root/.zshrc
-COPY ./rootfs/root/.bashrc /root/.bashrc
-
-#-----------------------------------------------------------------------------
-# Install Ruby with rbenv (default)
-#-----------------------------------------------------------------------------
-COPY ./rootfs/opt/rbenv.sh /etc/profile.d/rbenv.sh
-RUN git clone https://github.com/rbenv/rbenv.git /usr/local/rbenv \
-    && git clone https://github.com/rbenv/ruby-build.git /usr/local/rbenv/plugins/ruby-build \
-    && cd /usr/local/rbenv/bin \
-    && rbenv install ${RUBY_VERSION} \
-    && rbenv global ${RUBY_VERSION} \
-    && rbenv rehash \
-    && cd /usr/local/rbenv/shims \
-    && ruby -v
-
-#-----------------------------------------------------------------------------
-# Install Ruby with rvm (alternatives)
-#-----------------------------------------------------------------------------
-# COPY ./rootfs/opt/rvm.sh /etc/profile.d/rvm.sh
-# RUN gpg --keyserver hkp://keys.gnupg.net --recv-keys 409B6B1796C275462A1703113804BB82D39DC0E3 \
-#     && curl -sSL https://get.rvm.io | sudo bash -s stable \
-#     && sudo usermod -a -G rvm root \
-#     && sudo usermod -a -G rvm docker \
-#     && cd /usr/local/rvm/scripts \
-#     && rvm install ${RUBY_VERSION} \
-#     && rvm use ${RUBY_VERSION} --default \
-#     && cd /usr/bin \
-#     && ruby -v
+# COPY ./rootfs/root/.zshrc /root/.zshrc
+# COPY ./rootfs/root/.bashrc /root/.bashrc
+# COPY ./rootfs/opt/ruby.sh /etc/profile.d/ruby.sh
+# COPY ./rootfs/opt/install_ruby.sh /opt/install_ruby.sh
+RUN /opt/install_ruby.sh
 
 #-----------------------------------------------------------------------------
 # Copy package dependencies in Gemfile
@@ -76,9 +60,7 @@ COPY ./rootfs/root/Gemfile.lock /opt/Gemfile.lock
 # Install Ruby Packages (rbenv/rvm)
 #-----------------------------------------------------------------------------
 COPY ./rootfs/root/gems.sh /opt/gems.sh
-# RUN chmod 777 /opt/gems.sh; sync \
-#     chmod a+x /opt/gems.sh; sync \
-#     && ./opt/gems.sh
+RUN /opt/gems.sh
 
 # -----------------------------------------------------------------------------
 # UTC Timezone & Networking
@@ -88,6 +70,7 @@ RUN ln -sf \
 		/etc/localtime \
 	&& echo "NETWORKING=yes" > /etc/sysconfig/network
 
+USER root
 #-----------------------------------------------------------------------------
 # Change 'root' & 'docker' user Password
 #-----------------------------------------------------------------------------
@@ -99,14 +82,15 @@ RUN echo 'root:docker' | chpasswd \
 # Generate Public Key
 #-----------------------------------------------------------------------------
 # Create new public key
-RUN /usr/bin/ssh-keygen -t rsa -b 4096 -C "zeroc0d3.team@gmail.com" -f $HOME/.ssh/id_rsa
+RUN mkdir -p /root/.ssh \
+    && /usr/bin/ssh-keygen -t rsa -b 4096 -C "zeroc0d3.team@gmail.com" -f /root/.ssh/id_rsa -q -N ""; sync
 
 RUN mkdir -p $HOME/.ssh \
     && touch $HOME/.ssh/authorized_keys \
-    && chmod 700 $HOME/.ssh; sync \
-    && chmod go-w $HOME $HOME/.ssh; sync \
-    && chmod 600 $HOME/.ssh/authorized_keys; sync \
-    && chown `whoami` $HOME/.ssh/authorized_keys; sync \
+    && chmod 700 $HOME/.ssh \
+    && chmod go-w $HOME $HOME/.ssh \
+    && chmod 600 $HOME/.ssh/authorized_keys \
+    && chown `whoami` $HOME/.ssh/authorized_keys \
     && cat $HOME/.ssh/id_rsa.pub > $HOME/.ssh/authorized_keys
 
 # Create new pem file from public key
@@ -119,9 +103,9 @@ RUN mkdir -p /home/docker/.ssh \
     && touch /home/docker/.ssh/authorized_keys \
     && cat $HOME/.ssh/id_rsa.pub > /home/docker/.ssh/authorized_keys \
     && /usr/bin/ssh-keygen -f $HOME/.ssh/id_rsa.pub -e -m pem > /home/docker/.ssh/id_rsa.pem \
-    && chmod 700 /home/docker/.ssh; sync \
-    && chmod 600 /home/docker/.ssh/authorized_keys; sync \
-    && chmod 600 /home/docker/.ssh/id_rsa*; sync
+    && chmod 700 /home/docker/.ssh \
+    && chmod 600 /home/docker/.ssh/authorized_keys \
+    && chmod 600 /home/docker/.ssh/id_rsa*
 
 #-----------------------------------------------------------------------------
 # Create Workspace Application Folder
@@ -137,11 +121,6 @@ RUN chown -R docker:docker ${PATH_HOME}
 # Set Volume Docker Workspace
 #-----------------------------------------------------------------------------
 VOLUME ["/home/docker", "/home/docker/workspace", "/root"]
-
-#-----------------------------------------------------------------------------
-# Finalize (reconfigure)
-#-----------------------------------------------------------------------------
-COPY rootfs/ /
 
 #-----------------------------------------------------------------------------
 # Run Init Docker Container
