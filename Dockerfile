@@ -12,11 +12,6 @@ ENV RUBY_PACKAGE="rbenv"
     # ("rbenv" = using rbenv package manager, "rvm" = using rvm package manager)
 
 #-----------------------------------------------------------------------------
-# Set Configuration
-#-----------------------------------------------------------------------------
-COPY rootfs/ /
-
-#-----------------------------------------------------------------------------
 # Download & Install
 # -) vim
 # -) vundle + themes
@@ -44,11 +39,11 @@ RUN git clone https://github.com/dracula/vim.git /opt/vim-themes/dracula \
 # -) copy .zshrc to /root
 # -) copy .bashrc to /root
 #-----------------------------------------------------------------------------
-# COPY ./rootfs/root/.zshrc /root/.zshrc
-# COPY ./rootfs/root/.bashrc /root/.bashrc
-# COPY ./rootfs/opt/ruby.sh /etc/profile.d/ruby.sh
-# COPY ./rootfs/opt/install_ruby.sh /opt/install_ruby.sh
-RUN /opt/install_ruby.sh
+COPY ./rootfs/root/.zshrc /root/.zshrc
+COPY ./rootfs/root/.bashrc /root/.bashrc
+COPY ./rootfs/opt/ruby.sh /etc/profile.d/ruby.sh
+COPY ./rootfs/opt/install_ruby.sh /opt/install_ruby.sh
+RUN sudo /bin/sh /opt/install_ruby.sh
 
 #-----------------------------------------------------------------------------
 # Copy package dependencies in Gemfile
@@ -60,7 +55,7 @@ COPY ./rootfs/root/Gemfile.lock /opt/Gemfile.lock
 # Install Ruby Packages (rbenv/rvm)
 #-----------------------------------------------------------------------------
 COPY ./rootfs/root/gems.sh /opt/gems.sh
-RUN /opt/gems.sh
+RUN sudo /bin/sh /opt/gems.sh
 
 # -----------------------------------------------------------------------------
 # UTC Timezone & Networking
@@ -69,6 +64,11 @@ RUN ln -sf \
 		/usr/share/zoneinfo/UTC \
 		/etc/localtime \
 	&& echo "NETWORKING=yes" > /etc/sysconfig/network
+
+#-----------------------------------------------------------------------------
+# Set Configuration
+#-----------------------------------------------------------------------------
+COPY rootfs/ /
 
 USER root
 #-----------------------------------------------------------------------------
