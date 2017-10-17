@@ -119,7 +119,7 @@ RUN chown -R docker:docker ${PATH_HOME}
 #-----------------------------------------------------------------------------
 # Set Volume Docker Workspace
 #-----------------------------------------------------------------------------
-VOLUME ["/home/docker", "/home/docker/workspace", "/root"]
+VOLUME [${PATH_WORKSPACE}]
 
 #-----------------------------------------------------------------------------
 # Run Init Docker Container
