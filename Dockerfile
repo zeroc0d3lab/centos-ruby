@@ -26,7 +26,7 @@ RUN cd /opt/vim/src \
     && sudo mkdir /usr/share/vim/vim80/ \
     && sudo cp -fr /opt/vim/runtime/* /usr/share/vim/vim80/ \
     && git clone https://github.com/zeroc0d3/vim-ide.git /opt/vim-ide \
-    && /bin/sh /opt/vim-ide/step02.sh
+    && sudo /bin/sh /opt/vim-ide/step02.sh
 
 RUN git clone https://github.com/dracula/vim.git /opt/vim-themes/dracula \
     && git clone https://github.com/blueshirts/darcula.git /opt/vim-themes/darcula \
