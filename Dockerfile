@@ -111,8 +111,8 @@ RUN cd /usr/local/src \
             --prefix=/usr \
             --enable-multibyte \
             --enable-perlinterp=dynamic \
-            --enable-rubyinterp=dynamic \
-            --with-ruby-command=`which ruby` \
+#           --enable-rubyinterp=dynamic \
+#           --with-ruby-command=`which ruby` \
 #           --enable-pythoninterp=dynamic \
 #           --with-python-config-dir=/usr/lib/python2.7/config-x86_64-linux-gnu \
 #           --enable-python3interp \
