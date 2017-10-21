@@ -95,15 +95,14 @@ RUN cd /opt \
     && make \
     && sudo make install
 
-#-----------------------------------------------------------------------------
+-----------------------------------------------------------------------------
 # Download & Install
 # -) vim
 # -) vundle + themes
 #-----------------------------------------------------------------------------
-RUN cd /usr/local/src \
+RUN git clone https://github.com/vim/vim.git /root/vim \
 #   && sudo rm -rf /usr/local/share/vim /usr/bin/vim \
-    && git clone https://github.com/vim/vim.git \
-    && cd vim \
+    && cd /root/vim \
     && git checkout v${VIM_VERSION} \
     && cd src \
     && make autoconf \
@@ -135,16 +134,19 @@ RUN cd /usr/local/src \
     && sudo make install \
     && sudo mkdir -p /usr/share/vim \
     && sudo mkdir -p /usr/share/vim/vim80/ \
-    && sudo cp -fr /usr/local/src/vim/runtime/* /usr/share/vim/vim80/
+    && sudo cp -fr /root/vim/runtime/** /usr/share/vim/vim80/
 
 RUN git clone https://github.com/zeroc0d3/vim-ide.git $HOME/vim-ide \
     && sudo /bin/sh $HOME/vim-ide/step02.sh
 
 RUN git clone https://github.com/dracula/vim.git /opt/vim-themes/dracula \
     && git clone https://github.com/blueshirts/darcula.git /opt/vim-themes/darcula \
-    && mkdir -p $HOME/.vim/bundle/vim-colors/colors \
-    && cp /opt/vim-themes/dracula/colors/dracula.vim $HOME/.vim/bundle/vim-colors/colors/dracula.vim \
-    && cp /opt/vim-themes/darcula/colors/darcula.vim $HOME/.vim/bundle/vim-colors/colors/darcula.vim
+    && mkdir -p /root/.vim/bundle/vim-colors/colors \
+    && cp /opt/vim-themes/dracula/colors/dracula.vim /root/.vim/bundle/vim-colors/colors/dracula.vim \
+    && cp /opt/vim-themes/darcula/colors/darcula.vim /root/.vim/bundle/vim-colors/colors/darcula.vim
+
+RUN tar zcvf vim.tar.gz /root/vim /root/.vim \
+    && mv vim.tar.gz /opt
 
 # -----------------------------------------------------------------------------
 # UTC Timezone & Networking
