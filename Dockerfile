@@ -63,7 +63,6 @@ COPY ./rootfs/root/.zshrc /root/.zshrc
 COPY ./rootfs/root/.bashrc /root/.bashrc
 COPY ./rootfs/opt/ruby.sh /etc/profile.d/ruby.sh
 COPY ./rootfs/opt/install_ruby.sh /opt/install_ruby.sh
-RUN $SHELL
 RUN sudo /bin/sh /opt/install_ruby.sh
 
 #-----------------------------------------------------------------------------
