@@ -1,7 +1,7 @@
 #!/bin/sh
 
 DATE=`date '+%Y-%m-%d %H:%M:%S'`
-DEFAULT_VERSION='2.4.2'
+DEFAULT_VERSION='2.4.1'
 DEFAULT_PACKAGE='rbenv'
 
 logo() {
