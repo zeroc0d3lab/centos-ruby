@@ -62,8 +62,8 @@ RUN yum -y install \
 COPY ./rootfs/root/.zshrc /root/.zshrc
 COPY ./rootfs/root/.bashrc /root/.bashrc
 COPY ./rootfs/opt/ruby.sh /etc/profile.d/ruby.sh
-COPY ./rootfs/root/install_ruby.sh /opt/install_ruby.sh
-COPY ./rootfs/root/reload_shell.sh /opt/reload_shell.sh
+COPY ./rootfs/opt/install_ruby.sh /opt/install_ruby.sh
+COPY ./rootfs/opt/reload_shell.sh /opt/reload_shell.sh
 RUN sudo /bin/sh /opt/install_ruby.sh
 
 #-----------------------------------------------------------------------------
