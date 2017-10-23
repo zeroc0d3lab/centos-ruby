@@ -5,8 +5,8 @@ DEFAULT_VERSION="2.4.2"
 DEFAULT_PACKAGE="rbenv"
 INSTALL_VERSION=$DEFAULT_VERSION
 INSTALL_PACKAGE=$DEFAULT_PACKAGE
-USERNAME="zeroc0d3"
-PATH_HOME="/home/zeroc0d3"
+USERNAME="root"
+PATH_HOME="/root"
 
 ### Path Installation Ruby Package Manager ###
 RBENV_ROOT="$PATH_HOME/.rbenv"
