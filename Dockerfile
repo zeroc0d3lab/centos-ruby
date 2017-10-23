@@ -7,7 +7,7 @@ MAINTAINER ZeroC0D3 Team <zeroc0d3.team@gmail.com>
 ENV VIM_VERSION=8.0.1207 \
     LUA_VERSION=5.3.4 \
     LUAROCKS_VERSION=2.4.3 \
-    RUBY_VERSION=2.4.1 \
+    RUBY_VERSION=2.4.2 \
     PATH_HOME=/home/docker \
     PATH_WORKSPACE=/home/docker/workspace
 
