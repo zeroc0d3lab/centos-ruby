@@ -85,32 +85,54 @@ install_vim() {
   # -) vim
   # -) vundle + themes
   #-----------------------------------------------------------------------------
-  rm -rf /root/vim \
-    && git clone https://github.com/vim/vim.git /root/vim \
-    && cd /root/vim \
-    && git checkout v${VIM_VERSION} \
-    && cd src \
-    && make autoconf \
-    && ./configure \
-    && make distclean \
-    && make \
-    && cp config.mk.dist auto/config.mk \
-    && sudo make install \
-    && sudo mkdir -p /usr/share/vim \
-    && sudo mkdir -p /usr/share/vim/vim80/ \
-    && sudo cp -fr /root/vim/runtime/** /usr/share/vim/vim80/
+  rm -rf $HOME_PATH/vim \
+      && git clone https://github.com/vim/vim.git $HOME_PATH/vim \
+  #   && sudo rm -rf /usr/local/share/vim /usr/bin/vim \
+      && cd $HOME_PATH/vim \
+      && git checkout v$INSTALL_VERSION \
+      && cd src \
+      && make autoconf \
+      && ./configure \
+            # --prefix=/usr \
+            # --enable-multibyte \
+            # --enable-perlinterp=dynamic \
+            # --enable-rubyinterp=dynamic \
+            # --with-ruby-command=`which ruby` \
+            # --enable-pythoninterp=dynamic \
+            # --with-python-config-dir=/usr/lib/python2.7/config-x86_64-linux-gnu \
+            # --enable-python3interp \
+            # --with-python3-config-dir=/usr/lib/python3.5/config-3.5m-x86_64-linux-gnu \
+            # --enable-luainterp \
+            # --with-luajit \
+            # --with-lua-prefix=/usr/include/lua5.1 \
+            # --enable-cscope \
+            # --enable-gui=auto \
+            # --with-features=huge \
+            # --with-x \
+            # --enable-fontset \
+            # --enable-largefile \
+            # --disable-netbeans \
+            # --with-compiledby="ZeroC0D3 Team" \
+            # --enable-fail-if-missing \
+      && make distclean \
+      && make \
+      && cp config.mk.dist auto/config.mk \
+      && sudo make install \
+      && sudo mkdir -p /usr/share/vim \
+      && sudo mkdir -p /usr/share/vim/vim80/ \
+      && sudo cp -fr $HOME_PATH/vim/runtime/** /usr/share/vim/vim80/
 
-  git clone https://github.com/zeroc0d3/vim-ide.git /root/vim-ide \
-    && sudo /bin/sh /root/vim-ide/step02.sh
+  git clone https://github.com/zeroc0d3/vim-ide.git $HOME_PATH/vim-ide \
+      && sudo /bin/sh $HOME_PATH/vim-ide/step02.sh
 
   git clone https://github.com/dracula/vim.git /opt/vim-themes/dracula \
-    && git clone https://github.com/blueshirts/darcula.git /opt/vim-themes/darcula \
-    && mkdir -p /root/.vim/bundle/vim-colors/colors \
-    && cp /opt/vim-themes/dracula/colors/dracula.vim /root/.vim/bundle/vim-colors/colors/dracula.vim \
-    && cp /opt/vim-themes/darcula/colors/darcula.vim /root/.vim/bundle/vim-colors/colors/darcula.vim
+      && git clone https://github.com/blueshirts/darcula.git /opt/vim-themes/darcula \
+      && mkdir -p $HOME_PATH/.vim/bundle/vim-colors/colors \
+      && cp /opt/vim-themes/dracula/colors/dracula.vim $HOME_PATH/.vim/bundle/vim-colors/colors/dracula.vim \
+      && cp /opt/vim-themes/darcula/colors/darcula.vim $HOME_PATH/.vim/bundle/vim-colors/colors/darcula.vim
 
-  tar zcvf vim.tar.gz /root/vim /root/.vim \
-    && mv vim.tar.gz /opt
+  tar zcvf vim.tar.gz $HOME_PATH/vim $HOME_PATH/.vim \
+      && mv vim.tar.gz /opt
 }
 
 main() {
