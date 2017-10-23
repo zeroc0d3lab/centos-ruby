@@ -78,74 +78,14 @@ COPY ./rootfs/root/gems.sh /opt/gems.sh
 RUN sudo /bin/sh /opt/gems.sh
 
 #-----------------------------------------------------------------------------
-# Install Lua
-#-----------------------------------------------------------------------------
-RUN curl -L http://www.lua.org/ftp/lua-${LUA_VERSION}.tar.gz -o /opt/lua-${LUA_VERSION}.tar.gz \
-    && curl -L http://luarocks.github.io/luarocks/releases/luarocks-${LUAROCKS_VERSION}.tar.gz \
-         -o /opt/luarocks-${LUAROCKS_VERSION}.tar.gz
-
-RUN cd /opt \
-    && tar zxvf lua-${LUA_VERSION}.tar.gz \
-    && tar zxvf luarocks-${LUAROCKS_VERSION}.tar.gz \
-    && cd lua-${LUA_VERSION} \
-    && make linux \
-    && cd ../luarocks-${LUAROCKS_VERSION} \
-    && ./configure \
-    && make \
-    && sudo make install
-
-#-----------------------------------------------------------------------------
 # Download & Install
+# -) lua
+# -) luarocks
 # -) vim
 # -) vundle + themes
 #-----------------------------------------------------------------------------
-RUN git clone https://github.com/vim/vim.git /root/vim \
-#   && sudo rm -rf /usr/local/share/vim /usr/bin/vim \
-    && cd /root/vim \
-    && git checkout v${VIM_VERSION} \
-    && cd src \
-    && make autoconf \
-    && ./configure \
-#           --prefix=/usr \
-#           --enable-multibyte \
-#           --enable-perlinterp=dynamic \
-#           --enable-rubyinterp=dynamic \
-#           --with-ruby-command=`which ruby` \
-#           --enable-pythoninterp=dynamic \
-#           --with-python-config-dir=/usr/lib/python2.7/config-x86_64-linux-gnu \
-#           --enable-python3interp \
-#           --with-python3-config-dir=/usr/lib/python3.5/config-3.5m-x86_64-linux-gnu \
-#           --enable-luainterp \
-#           --with-luajit \
-#           --with-lua-prefix=/usr/include/lua5.1 \
-#           --enable-cscope \
-#           --enable-gui=auto \
-#           --with-features=huge \
-#           --with-x \
-#           --enable-fontset \
-#           --enable-largefile \
-#           --disable-netbeans \
-#           --with-compiledby="ZeroC0D3 Team" \
-#           --enable-fail-if-missing \
-    && make distclean \
-    && make \
-    && cp config.mk.dist auto/config.mk \
-    && sudo make install \
-    && sudo mkdir -p /usr/share/vim \
-    && sudo mkdir -p /usr/share/vim/vim80/ \
-    && sudo cp -fr /root/vim/runtime/** /usr/share/vim/vim80/
-
-RUN git clone https://github.com/zeroc0d3/vim-ide.git /root/vim-ide \
-    && sudo /bin/sh /root/vim-ide/step02.sh
-
-RUN git clone https://github.com/dracula/vim.git /opt/vim-themes/dracula \
-    && git clone https://github.com/blueshirts/darcula.git /opt/vim-themes/darcula \
-    && mkdir -p /root/.vim/bundle/vim-colors/colors \
-    && cp /opt/vim-themes/dracula/colors/dracula.vim /root/.vim/bundle/vim-colors/colors/dracula.vim \
-    && cp /opt/vim-themes/darcula/colors/darcula.vim /root/.vim/bundle/vim-colors/colors/darcula.vim
-
-RUN tar zcvf vim.tar.gz /root/vim /root/.vim \
-    && mv vim.tar.gz /opt
+COPY ./rootfs/opt/install_ruby.sh /opt/install_vim.sh
+RUN sudo /bin/sh /opt/install_vim.sh
 
 # -----------------------------------------------------------------------------
 # UTC Timezone & Networking
