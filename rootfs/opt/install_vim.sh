@@ -7,7 +7,8 @@ DEFAULT_LUAROCKS='2.4.3'
 INSTALL_VERSION=$DEFAULT_VERSION
 INSTALL_LUA=$DEFAULT_LUA
 INSTALL_LUAROCKS=$DEFAULT_LUAROCKS
-HOME_PATH='/root'
+USERNAME=`echo $USER`
+PATH_HOME=`echo $HOME`
 
 logo() {
   echo "--------------------------------------------------------------------------"
@@ -85,32 +86,31 @@ install_vim() {
   # -) vim
   # -) vundle + themes
   #-----------------------------------------------------------------------------
-  rm -rf /root/vim \
-    && git clone https://github.com/vim/vim.git /root/vim \
-    && cd /root/vim \
-    && git checkout v${VIM_VERSION} \
-    && cd src \
-    && make autoconf \
-    && ./configure \
-    && make distclean \
-    && make \
-    && cp config.mk.dist auto/config.mk \
-    && sudo make install \
-    && sudo mkdir -p /usr/share/vim \
-    && sudo mkdir -p /usr/share/vim/vim80/ \
-    && sudo cp -fr /root/vim/runtime/** /usr/share/vim/vim80/
+  rm -rf $PATH_HOME/vim \
+      && git clone https://github.com/vim/vim.git $PATH_HOME/vim \
+      && cd $PATH_HOME/vim \
+      && git checkout v$INSTALL_VERSION \
+      && cd src \
+      && make autoconf \
+      && ./configure \
+      && make distclean \
+      && make \
+      && cp config.mk.dist auto/config.mk \
+      && sudo make install \
+      && sudo mkdir -p /usr/share/vim \
+      && sudo mkdir -p /usr/share/vim/vim80/ \
+      && sudo cp -fr $PATH_HOME/vim/runtime/** /usr/share/vim/vim80/
 
-  git clone https://github.com/zeroc0d3/vim-ide.git /root/vim-ide \
-    && sudo /bin/sh /root/vim-ide/step02.sh
+  curl -sSL https://raw.githubusercontent.com/zeroc0d3/vim-ide/master/step02.sh | sudo bash -s
 
   git clone https://github.com/dracula/vim.git /opt/vim-themes/dracula \
-    && git clone https://github.com/blueshirts/darcula.git /opt/vim-themes/darcula \
-    && mkdir -p /root/.vim/bundle/vim-colors/colors \
-    && cp /opt/vim-themes/dracula/colors/dracula.vim /root/.vim/bundle/vim-colors/colors/dracula.vim \
-    && cp /opt/vim-themes/darcula/colors/darcula.vim /root/.vim/bundle/vim-colors/colors/darcula.vim
+      && git clone https://github.com/blueshirts/darcula.git /opt/vim-themes/darcula \
+      && mkdir -p $PATH_HOME/.vim/bundle/vim-colors/colors \
+      && cp /opt/vim-themes/dracula/colors/dracula.vim $PATH_HOME/.vim/bundle/vim-colors/colors/dracula.vim \
+      && cp /opt/vim-themes/darcula/colors/darcula.vim $PATH_HOME/.vim/bundle/vim-colors/colors/darcula.vim
 
-  tar zcvf vim.tar.gz /root/vim /root/.vim \
-    && mv vim.tar.gz /opt
+  tar zcvf vim.tar.gz $PATH_HOME/vim $PATH_HOME/.vim \
+      && mv vim.tar.gz /opt
 }
 
 main() {
