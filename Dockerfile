@@ -84,7 +84,7 @@ RUN sudo /bin/sh /opt/gems.sh
 # -) vim
 # -) vundle + themes
 #-----------------------------------------------------------------------------
-COPY ./rootfs/opt/install_ruby.sh /opt/install_vim.sh
+COPY ./rootfs/opt/install_vim.sh /opt/install_vim.sh
 RUN sudo /bin/sh /opt/install_vim.sh
 
 # -----------------------------------------------------------------------------
