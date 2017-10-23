@@ -64,6 +64,7 @@ COPY ./rootfs/root/.bashrc /root/.bashrc
 COPY ./rootfs/opt/ruby.sh /etc/profile.d/ruby.sh
 COPY ./rootfs/opt/install_ruby.sh /opt/install_ruby.sh
 COPY ./rootfs/opt/reload_shell.sh /opt/reload_shell.sh
+RUN exec $SHELL
 RUN sudo /bin/sh /opt/install_ruby.sh
 
 #-----------------------------------------------------------------------------
@@ -86,7 +87,56 @@ RUN sudo /bin/sh /opt/gems.sh
 # -) vundle + themes
 #-----------------------------------------------------------------------------
 COPY ./rootfs/opt/install_vim.sh /opt/install_vim.sh
-RUN sudo /bin/sh /opt/install_vim.sh
+# RUN sudo /bin/sh /opt/install_vim.sh
+
+#-----------------------------------------------------------------------------
+# Install Lua
+#-----------------------------------------------------------------------------
+RUN curl -L http://www.lua.org/ftp/lua-${LUA_VERSION}.tar.gz -o /opt/lua-${LUA_VERSION}.tar.gz \
+    && curl -L http://luarocks.github.io/luarocks/releases/luarocks-${LUAROCKS_VERSION}.tar.gz \
+         -o /opt/luarocks-${LUAROCKS_VERSION}.tar.gz
+
+RUN cd /opt \
+    && tar zxvf lua-${LUA_VERSION}.tar.gz \
+    && tar zxvf luarocks-${LUAROCKS_VERSION}.tar.gz \
+    && cd lua-${LUA_VERSION} \
+    && make linux \
+    && cd ../luarocks-${LUAROCKS_VERSION} \
+    && ./configure \
+    && make \
+    && sudo make install
+
+#-----------------------------------------------------------------------------
+# Download & Install
+# -) vim
+# -) vundle + themes
+#-----------------------------------------------------------------------------
+RUN rm -rf /root/vim \
+    && git clone https://github.com/vim/vim.git /root/vim \
+    && cd /root/vim \
+    && git checkout v${VIM_VERSION} \
+    && cd src \
+    && make autoconf \
+    && ./configure \
+    && make distclean \
+    && make \
+    && cp config.mk.dist auto/config.mk \
+    && sudo make install \
+    && sudo mkdir -p /usr/share/vim \
+    && sudo mkdir -p /usr/share/vim/vim80/ \
+    && sudo cp -fr /root/vim/runtime/** /usr/share/vim/vim80/
+
+RUN git clone https://github.com/zeroc0d3/vim-ide.git /root/vim-ide \
+    && sudo /bin/sh /root/vim-ide/step02.sh
+
+RUN git clone https://github.com/dracula/vim.git /opt/vim-themes/dracula \
+    && git clone https://github.com/blueshirts/darcula.git /opt/vim-themes/darcula \
+    && mkdir -p /root/.vim/bundle/vim-colors/colors \
+    && cp /opt/vim-themes/dracula/colors/dracula.vim /root/.vim/bundle/vim-colors/colors/dracula.vim \
+    && cp /opt/vim-themes/darcula/colors/darcula.vim /root/.vim/bundle/vim-colors/colors/darcula.vim
+
+RUN tar zcvf vim.tar.gz /root/vim /root/.vim \
+    && mv vim.tar.gz /opt
 
 # -----------------------------------------------------------------------------
 # UTC Timezone & Networking
