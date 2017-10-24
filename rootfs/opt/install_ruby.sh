@@ -102,11 +102,12 @@ install_ruby() {
     # Get repo rbenv
     #-----------------------------------------------------------------------------
     git clone https://github.com/rbenv/rbenv.git $RBENV_ROOT \
-      && git clone https://github.com/rbenv/ruby-build.git $RBENV_ROOT/plugins/ruby-build \
+      && git clone https://github.com/rbenv/ruby-build.git $RBENV_ROOT/plugins/ruby-build 
     
     #-----------------------------------------------------------------------------
     # Install Ruby with rbenv (default)
     #-----------------------------------------------------------------------------
+    reload_env_shell
     $RBENV_ROOT/bin/rbenv install $INSTALL_VERSION \
       && $RBENV_ROOT/bin/rbenv global $INSTALL_VERSION \
       && $RBENV_ROOT/bin/rbenv rehash \
@@ -126,6 +127,7 @@ install_ruby() {
     #-----------------------------------------------------------------------------
     # Install Ruby with rvm (alternatives)
     #-----------------------------------------------------------------------------
+    reload_env_shell
     $RVM_ROOT/bin/rvm install $INSTALL_VERSION \
       && $RVM_ROOT/bin/rvm use $INSTALL_VERSION --default \
       && /usr/bin/ruby -v
