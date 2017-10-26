@@ -169,23 +169,16 @@ RUN git clone https://github.com/Anthony25/gnome-terminal-colors-solarized.git /
 # -) copy .zshrc to /root
 # -) copy .bashrc to /root
 #-----------------------------------------------------------------------------
+RUN git clone https://github.com/zeroc0d3/ruby-installation /opt/ruby_installer 
+
 COPY ./rootfs/root/.zshrc /root/.zshrc
 COPY ./rootfs/root/.bashrc /root/.bashrc
-COPY ./rootfs/opt/ruby.sh /etc/profile.d/ruby.sh
-COPY ./rootfs/opt/install_ruby.sh /opt/install_ruby.sh
-RUN sudo /bin/sh /opt/install_ruby.sh
-
-#-----------------------------------------------------------------------------
-# Copy package dependencies in Gemfile
-#-----------------------------------------------------------------------------
-COPY ./rootfs/root/Gemfile /opt/Gemfile
-COPY ./rootfs/root/Gemfile.lock /opt/Gemfile.lock
+RUN sudo /bin/sh /opt/ruby_installer/install_ruby.sh
 
 #-----------------------------------------------------------------------------
 # Install Ruby Packages (rbenv/rvm)
 #-----------------------------------------------------------------------------
-COPY ./rootfs/root/gems.sh /opt/gems.sh
-RUN sudo /bin/sh /opt/gems.sh
+RUN sudo /bin/sh /opt/ruby_installer/gems.sh
 
 #-----------------------------------------------------------------------------
 # Clean Up All Cache
