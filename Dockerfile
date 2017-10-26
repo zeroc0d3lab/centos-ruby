@@ -283,7 +283,7 @@ RUN chmod a+x /opt/24-bit-color.sh; sync \
 # Cleanup 'root' folder
 #-----------------------------------------------------------------------------
 RUN rm -f /root/*.tar.gz \
-    && rm -f /root/*.zip 
+    && rm -f /root/*.zip \
     && rm -f /opt/*.tar.gz \
     && rm -f /opt/*.zip
 
