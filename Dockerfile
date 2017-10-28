@@ -4,7 +4,7 @@ MAINTAINER ZeroC0D3 Team <zeroc0d3.team@gmail.com>
 #-----------------------------------------------------------------------------
 # Set Environment
 #-----------------------------------------------------------------------------
-ENV RUBY_VERSION=2.4.1 \
+ENV RUBY_VERSION=2.4.2 \
     PATH_HOME=/home/docker \
     PATH_WORKSPACE=/home/docker/workspace
 
